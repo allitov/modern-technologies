@@ -1,11 +1,18 @@
 package io.allitov.todo;
 
-import lombok.extern.slf4j.Slf4j;
+import io.allitov.todo.view.MainWindowImpl;
 
-@Slf4j
-public class Main {
+import java.awt.EventQueue;
 
+/**
+ * Точка входа приложения менеджера задач.
+ */
+public final class Main {
+
+    /**
+     * Запускает окно менеджера задач в потоке обработки событий Swing.
+     */
     static void main() {
-        log.info("Hello World!");
+        EventQueue.invokeLater(() -> new MainWindowImpl().show());
     }
 }
