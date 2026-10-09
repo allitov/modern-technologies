@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * Управляет задачами и проектами.
+ * Реализация {@link TaskManager}.
  */
 @NoArgsConstructor
 public class TaskManagerImpl implements TaskManager {
