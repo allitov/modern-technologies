@@ -18,6 +18,8 @@ public class Task {
 
     private TaskPriority priority = TaskPriority.MEDIUM;
 
+    private int projectId;
+
     /**
      * Создает задачу с указанным идентификатором и названием.
      *
@@ -25,7 +27,19 @@ public class Task {
      * @param title название задачи.
      */
     public Task(int id, String title) {
+        this(id, title, 0);
+    }
+
+    /**
+     * Создает задачу с указанным идентификатором, названием и проектом.
+     *
+     * @param id идентификатор задачи.
+     * @param title название задачи.
+     * @param projectId идентификатор проекта; значение {@code 0} означает отсутствие проекта.
+     */
+    public Task(int id, String title, int projectId) {
         this.id = id;
         this.title = title;
+        this.projectId = projectId;
     }
 }

@@ -19,8 +19,18 @@ public interface TaskManager {
      * @param description описание задачи.
      * @param priority приоритет задачи.
      * @param status статус задачи.
+     * @param projectId идентификатор проекта задачи; значение {@code 0} означает отсутствие проекта.
      */
-    void addTask(String title, String description, TaskPriority priority, TaskStatus status);
+    void addTask(String title, String description, TaskPriority priority, TaskStatus status, int projectId);
+
+    /**
+     * Переносит задачу в указанный проект.
+     *
+     * @param taskIndex индекс переносимой задачи.
+     * @param projectId идентификатор целевого проекта; значение {@code 0} означает отвязку задачи от проекта.
+     * @return {@code true}, если перенос выполнен; {@code false}, если индекс некорректен или целевой проект не найден.
+     */
+    boolean moveTaskToProject(int taskIndex, int projectId);
 
     /**
      * Обновляет задачу по ее индексу, сохраняя исходный идентификатор.
@@ -55,7 +65,7 @@ public interface TaskManager {
     void addProject(String name);
 
     /**
-     * Удаляет проект по его индексу.
+     * Удаляет проект по его индексу вместе со всеми его задачами.
      *
      * @param index индекс удаляемого проекта.
      */
@@ -67,4 +77,29 @@ public interface TaskManager {
      * @return список проектов.
      */
     List<Project> getProjects();
+
+    /**
+     * Считает количество задач в проекте.
+     *
+     * @param projectId идентификатор проекта.
+     * @return количество задач проекта.
+     */
+    int countTasksInProject(int projectId);
+
+    /**
+     * Считает количество задач проекта с указанным статусом.
+     *
+     * @param projectId идентификатор проекта.
+     * @param status статус задач.
+     * @return количество задач проекта с указанным статусом.
+     */
+    int countTasksInProjectByStatus(int projectId, TaskStatus status);
+
+    /**
+     * Вычисляет процент выполненных задач проекта.
+     *
+     * @param projectId идентификатор проекта.
+     * @return процент задач со статусом {@code Done} от общего числа задач проекта; {@code 0.0}, если у проекта нет задач.
+     */
+    double completionPercent(int projectId);
 }

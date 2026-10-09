@@ -360,7 +360,7 @@ public class MainWindowImpl implements MainWindow {
         }
 
         manager.addTask(titleInput.getText(), descriptionInput.getText(),
-                selectedPriority(), selectedStatus());
+                selectedPriority(), selectedStatus(), selectedProjectId());
         refreshTasks();
         clearTaskFields();
     }
@@ -435,12 +435,23 @@ public class MainWindowImpl implements MainWindow {
     private void onProjectSelected() {
         int row = projectList.getSelectedIndex();
         if (row >= 0) {
-            String name = projectList.getSelectedValue();
-            statistics.setText(String.format("Selected project: %s    Tasks: %d    Projects: %d",
-                    name == null ? "" : name,
-                    manager.getTasks().size(),
+            Project project = manager.getProjects().get(row);
+            statistics.setText(String.format("Selected project: %s    Tasks: %d    Done: %.0f%%    Projects: %d",
+                    project.getName(),
+                    manager.countTasksInProject(project.getId()),
+                    manager.completionPercent(project.getId()),
                     manager.getProjects().size()));
         }
+    }
+
+    /**
+     * Получает идентификатор выбранного проекта.
+     *
+     * @return идентификатор выбранного проекта или {@code 0}, если проект не выбран.
+     */
+    private int selectedProjectId() {
+        int row = projectList.getSelectedIndex();
+        return row < 0 ? 0 : manager.getProjects().get(row).getId();
     }
 
     /**

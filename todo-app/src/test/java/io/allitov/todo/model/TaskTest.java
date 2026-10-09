@@ -14,6 +14,21 @@ class TaskTest {
         assertSoftly(softly -> {
             softly.assertThat(task.getId()).isEqualTo(7);
             softly.assertThat(task.getTitle()).isEqualTo("Read a book");
+            softly.assertThat(task.getProjectId()).isZero();
+            softly.assertThat(task.getDescription()).isEmpty();
+            softly.assertThat(task.getStatus()).isEqualTo(TaskStatus.TODO);
+            softly.assertThat(task.getPriority()).isEqualTo(TaskPriority.MEDIUM);
+        });
+    }
+
+    @Test
+    void constructorCreatesTaskWithProject() {
+        Task task = new Task(7, "Read a book", 3);
+
+        assertSoftly(softly -> {
+            softly.assertThat(task.getId()).isEqualTo(7);
+            softly.assertThat(task.getTitle()).isEqualTo("Read a book");
+            softly.assertThat(task.getProjectId()).isEqualTo(3);
             softly.assertThat(task.getDescription()).isEmpty();
             softly.assertThat(task.getStatus()).isEqualTo(TaskStatus.TODO);
             softly.assertThat(task.getPriority()).isEqualTo(TaskPriority.MEDIUM);
@@ -28,12 +43,14 @@ class TaskTest {
         task.setDescription("Use the annual statistics");
         task.setStatus(TaskStatus.IN_PROGRESS);
         task.setPriority(TaskPriority.HIGH);
+        task.setProjectId(2);
 
         assertSoftly(softly -> {
             softly.assertThat(task.getTitle()).isEqualTo("Write a report");
             softly.assertThat(task.getDescription()).isEqualTo("Use the annual statistics");
             softly.assertThat(task.getStatus()).isEqualTo(TaskStatus.IN_PROGRESS);
             softly.assertThat(task.getPriority()).isEqualTo(TaskPriority.HIGH);
+            softly.assertThat(task.getProjectId()).isEqualTo(2);
         });
     }
 
@@ -45,6 +62,6 @@ class TaskTest {
         assertThat(first)
                 .isEqualTo(second)
                 .hasSameHashCodeAs(second)
-                .hasToString("Task(id=1, title=Read a book, description=, status=Todo, priority=Medium)");
+                .hasToString("Task(id=1, title=Read a book, description=, status=Todo, priority=Medium, projectId=0)");
     }
 }
