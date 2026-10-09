@@ -1,4 +1,4 @@
-package io.allitov;
+package io.allitov.todo;
 
 import lombok.extern.slf4j.Slf4j;
 
