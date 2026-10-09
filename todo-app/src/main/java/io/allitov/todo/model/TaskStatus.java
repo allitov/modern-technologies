@@ -1,11 +1,13 @@
 package io.allitov.todo.model;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Определяет возможные статусы задачи.
  */
 @Getter
+@RequiredArgsConstructor
 public enum TaskStatus {
 
     /**
@@ -24,10 +26,6 @@ public enum TaskStatus {
     DONE("Done");
 
     private final String displayName;
-
-    TaskStatus(String displayName) {
-        this.displayName = displayName;
-    }
 
     @Override
     public String toString() {

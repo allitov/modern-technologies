@@ -1,11 +1,13 @@
 package io.allitov.todo.model;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Определяет возможные приоритеты задачи.
  */
 @Getter
+@RequiredArgsConstructor
 public enum TaskPriority {
 
     /**
@@ -24,10 +26,6 @@ public enum TaskPriority {
     HIGH("High");
 
     private final String displayName;
-
-    TaskPriority(String displayName) {
-        this.displayName = displayName;
-    }
 
     @Override
     public String toString() {
