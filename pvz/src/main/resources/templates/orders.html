@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ПВЗ — управление заказами</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<h1>ПВЗ — управление заказами</h1>
+
+<div class="status-bar" th:classappend="${msg != null ? 'msg-' + msgType : ''}">
+    <span th:if="${msg != null}" th:text="${msg}">Сообщение</span>
+    <span th:if="${msg == null}">Готово • Заказов: <span th:text="${count}">0</span></span>
+</div>
+
+<div class="toolbar">
+    <form method="get" action="/">
+        <input type="text" name="filter" th:value="${filter}" placeholder="Поиск по коду, телефону или артикулу">
+        <select name="status">
+            <option value="" th:selected="${#strings.isEmpty(status)}">Все</option>
+            <option value="ready" th:selected="${status == 'ready'}"
+                    th:text="${T(io.allitov.pvz.model.OrderStatus).READY.displayName}">К выдаче</option>
+            <option value="issued" th:selected="${status == 'issued'}"
+                    th:text="${T(io.allitov.pvz.model.OrderStatus).ISSUED.displayName}">Выдан</option>
+            <option value="cancelled" th:selected="${status == 'cancelled'}"
+                    th:text="${T(io.allitov.pvz.model.OrderStatus).CANCELLED.displayName}">Отменён</option>
+        </select>
+        <button type="submit">Обновить</button>
+    </form>
+    <a class="button button-primary" th:href="@{/orders/new}">+ Принять</a>
+    <a class="button" th:href="@{/report}">Отчёт</a>
+</div>
+
+<form id="orders-form" method="post" action="/">
+    <table class="orders">
+        <thead>
+        <tr>
+            <th>Код</th>
+            <th>Телефон</th>
+            <th>Артикул</th>
+            <th>Ячейка</th>
+            <th>Статус</th>
+            <th>Поступил</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${#lists.isEmpty(orders)}">
+            <td colspan="6" class="empty">Заказов нет</td>
+        </tr>
+        <th:block th:each="order : ${orders}">
+            <tr th:replace="~{orders :: order-row(${order})}"></tr>
+        </th:block>
+        </tbody>
+    </table>
+
+    <div class="toolbar">
+        <button type="submit" class="button-primary" data-action="issue" onclick="return rowAction(event, this)">Выдать</button>
+        <button type="submit" class="button-warn" data-action="cancel" onclick="return rowAction(event, this)">Отменить</button>
+        <button type="submit" class="button-danger" formaction="/orders/cleanup" data-action="cleanup"
+                th:attr="data-count=${closedCount}" onclick="return rowAction(event, this)">Очистить историю</button>
+    </div>
+</form>
+
+<div th:remove="all">
+    <tr th:fragment="order-row(order)"
+        th:with="st=${T(io.allitov.pvz.model.OrderStatus).fromDb(order.status)}"
+        th:classappend="${st.cssClass}">
+        <td>
+            <label class="cell-code">
+                <input type="radio" name="code" th:value="${order.code}"
+                       th:attr="data-phone=${#strings.isEmpty(order.phone) ? '—' : order.phone},data-cell=${#strings.isEmpty(order.cell) ? '—' : order.cell}">
+                <span th:text="${order.code}">PVZ-000001</span>
+            </label>
+        </td>
+        <td th:text="${#strings.isEmpty(order.phone) ? '—' : order.phone}">—</td>
+        <td th:text="${#strings.isEmpty(order.article) ? '—' : order.article}">—</td>
+        <td th:text="${#strings.isEmpty(order.cell) ? '—' : order.cell}">—</td>
+        <td class="badge" th:classappend="${st.cssClass}" th:text="${st.displayName}">К выдаче</td>
+        <td th:text="${order.createdAt}">2026-01-01 10:00</td>
+    </tr>
+</div>
+
+<script>
+    function rowAction(evt, btn) {
+        var form = btn.form;
+        var action = btn.dataset.action;
+        if (action === 'cleanup') {
+            return confirm('Удалить ' + btn.dataset.count + ' заказ(ов) со статусами «Выдан» и «Отменён»? Это действие нельзя отменить.');
+        }
+        var selected = form.querySelector('input[name="code"]:checked');
+        if (!selected) {
+            evt.preventDefault();
+            alert('Выберите заказ в списке.');
+            return false;
+        }
+        var message = action === 'issue'
+            ? 'Выдать заказ ' + selected.value + '? Телефон: ' + selected.dataset.phone + ' Ячейка: ' + selected.dataset.cell
+            : 'Отменить заказ ' + selected.value + '?';
+        if (!confirm(message)) {
+            evt.preventDefault();
+            return false;
+        }
+        form.action = '/orders/' + encodeURIComponent(selected.value) + '/' + action;
+        return true;
+    }
+</script>
+</body>
+</html>

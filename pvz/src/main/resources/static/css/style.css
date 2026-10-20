@@ -1,0 +1,262 @@
+/*
+ * Стили веб-интерфейса пункта выдачи заказов (ПВЗ).
+ * Палитра статусов C++-референса: ready — синий, issued — зелёный,
+ * cancelled — красный, предупреждения — оранжевый.
+ */
+
+:root {
+    --color-ready: rgb(44, 123, 229);
+    --color-issued: rgb(40, 167, 69);
+    --color-cancelled: rgb(220, 53, 69);
+    --color-warn: rgb(255, 152, 0);
+    --color-text: rgb(33, 37, 41);
+    --color-muted: rgb(108, 117, 125);
+    --color-border: rgb(222, 226, 230);
+    --color-bg: rgb(246, 247, 249);
+    --color-card: rgb(255, 255, 255);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    font-size: 16px;
+}
+
+h1 {
+    margin: 0 0 16px;
+    font-size: 1.5rem;
+}
+
+h2 {
+    margin: 0 0 8px;
+    font-size: 1.1rem;
+}
+
+/* Статус-бар */
+.status-bar {
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-card);
+}
+
+.status-bar.msg-ok {
+    background: var(--color-issued);
+    border-color: transparent;
+    color: var(--color-card);
+}
+
+.status-bar.msg-warn {
+    background: var(--color-warn);
+    border-color: transparent;
+    color: var(--color-card);
+}
+
+.status-bar.msg-err {
+    background: var(--color-cancelled);
+    border-color: transparent;
+    color: var(--color-card);
+}
+
+/* Панели инструментов */
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.toolbar form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 420px;
+}
+
+input[type="text"],
+select {
+    padding: 8px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-card);
+    color: var(--color-text);
+    font: inherit;
+}
+
+.toolbar input[type="text"] {
+    flex: 1 1 220px;
+}
+
+input[type="radio"] {
+    accent-color: var(--color-ready);
+}
+
+/* Кнопки */
+button,
+.button {
+    display: inline-block;
+    padding: 8px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-card);
+    color: var(--color-text);
+    font: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+button:hover,
+.button:hover {
+    filter: brightness(0.96);
+}
+
+.button-primary {
+    background: var(--color-ready);
+    border-color: transparent;
+    color: var(--color-card);
+}
+
+.button-warn {
+    background: var(--color-warn);
+    border-color: transparent;
+    color: var(--color-card);
+}
+
+.button-danger {
+    background: var(--color-cancelled);
+    border-color: transparent;
+    color: var(--color-card);
+}
+
+/* Таблицы */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th,
+td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+thead th {
+    background: rgb(241, 243, 245);
+    font-weight: 600;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Строки и бейджи статусов */
+tr.status-ready {
+    background: rgba(44, 123, 229, 0.07);
+}
+
+tr.status-issued {
+    background: rgba(40, 167, 69, 0.07);
+}
+
+tr.status-cancelled {
+    background: rgba(220, 53, 69, 0.07);
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.badge.status-ready {
+    background: rgba(44, 123, 229, 0.14);
+    color: var(--color-ready);
+}
+
+.badge.status-issued {
+    background: rgba(40, 167, 69, 0.14);
+    color: var(--color-issued);
+}
+
+.badge.status-cancelled {
+    background: rgba(220, 53, 69, 0.14);
+    color: var(--color-cancelled);
+}
+
+.cell-code {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.empty {
+    color: var(--color-muted);
+    font-style: italic;
+    text-align: center;
+}
+
+/* Формы */
+.form-card {
+    max-width: 480px;
+    padding: 20px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-card);
+}
+
+.form-card label {
+    display: block;
+    margin: 12px 0 4px;
+    font-weight: 600;
+}
+
+.form-card input[type="text"] {
+    width: 100%;
+}
+
+.hint {
+    margin: 4px 0 0;
+    color: var(--color-muted);
+    font-size: 0.85rem;
+}
+
+.error {
+    margin: 4px 0 0;
+    color: var(--color-cancelled);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Отчёт */
+.summary {
+    margin: 0 0 16px;
+    padding: 10px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-card);
+    font-weight: 600;
+}
+
+.report-section {
+    margin-bottom: 24px;
+}
