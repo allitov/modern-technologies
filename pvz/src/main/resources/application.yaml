@@ -7,3 +7,4 @@ spring:
     password: ${PICKUP_DB_PASSWORD:password}
   flyway:
     locations: classpath:db/migration
+    enabled: true

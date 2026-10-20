@@ -1,6 +1,5 @@
 package io.allitov.pvz.web;
 
-import io.allitov.pvz.db.Database;
 import io.allitov.pvz.model.Order;
 import io.allitov.pvz.model.OrderStatus;
 import io.allitov.pvz.service.OrderService;
@@ -20,7 +19,7 @@ import java.util.List;
  *
  * <p>Тонкий контроллер: отвечает только за маршрутизацию, валидацию формы
  * приёмки и flash-сообщения; вся работа с данными выполняется через
- * {@link Database}, внедряемый через конструктор. Каждый изменяющий запрос
+ * {@link OrderService}, внедряемый через конструктор. Каждый изменяющий запрос
  * выполнен по схеме PRG (Post/Redirect/Get): после обработки происходит
  * перенаправление на список заказов, а текст и цвет сообщения передаются
  * через flash-атрибуты {@code msg} и {@code msgType}
@@ -98,7 +97,8 @@ public class OrderController {
             @RequestParam(name = "contact", defaultValue = "") String contact,
             @RequestParam(name = "cell", defaultValue = "") String cell,
             Model model,
-            RedirectAttributes attributes) {
+            RedirectAttributes attributes
+    ) {
         String trimmed = contact.trim();
         if (trimmed.length() < 5) {
             model.addAttribute("contactError", "Введите телефон или артикул посылки");
