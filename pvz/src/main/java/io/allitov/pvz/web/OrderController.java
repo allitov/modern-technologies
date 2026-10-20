@@ -1,12 +1,10 @@
 package io.allitov.pvz.web;
 
-import java.util.List;
-
 import io.allitov.pvz.db.Database;
 import io.allitov.pvz.model.Order;
 import io.allitov.pvz.model.OrderStatus;
+import io.allitov.pvz.service.OrderService;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 /**
  * Веб-контроллер пункта выдачи заказов (ПВЗ).
@@ -30,10 +30,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor
 public class OrderController {
 
-    /**
-     * Слой доступа к данным заказов.
-     */
-    private final Database database;
+    private final OrderService orderService;
 
     /**
      * Отображает список заказов с поиском и фильтром по статусу.
@@ -52,8 +49,9 @@ public class OrderController {
     public String list(
             @RequestParam(name = "filter", defaultValue = "") String filter,
             @RequestParam(name = "status", defaultValue = "") String status,
-            Model model) {
-        List<Order> orders = database.listOrders(filter);
+            Model model
+    ) {
+        List<Order> orders = orderService.listOrders(filter);
         List<Order> filtered = status.isEmpty()
                 ? orders
                 : orders.stream()
@@ -63,7 +61,7 @@ public class OrderController {
         model.addAttribute("filter", filter);
         model.addAttribute("status", status);
         model.addAttribute("count", filtered.size());
-        model.addAttribute("closedCount", database.countClosedOrders());
+        model.addAttribute("closedCount", orderService.countClosedOrders());
         return "orders";
     }
 
@@ -114,7 +112,7 @@ public class OrderController {
             model.addAttribute("cell", cell);
             return "order-add";
         }
-        String code = database.addOrder(trimmed, cell);
+        String code = orderService.addOrder(trimmed, cell);
         attributes.addFlashAttribute("msg", "Принят заказ " + code);
         attributes.addFlashAttribute("msgType", "ok");
         return "redirect:/";
@@ -139,12 +137,12 @@ public class OrderController {
             attributes.addFlashAttribute("msgType", "warn");
             return "redirect:/";
         }
-        if (database.issueOrder(code)) {
+        if (orderService.issueOrder(code)) {
             attributes.addFlashAttribute("msg", "Выдан " + code);
             attributes.addFlashAttribute("msgType", "ok");
             return "redirect:/";
         }
-        String displayName = database.listOrders("").stream()
+        String displayName = orderService.listOrders("").stream()
                 .filter(order -> code.equals(order.getCode()))
                 .findFirst()
                 .map(order -> OrderStatus.fromDb(order.getStatus()).getDisplayName())
@@ -174,7 +172,7 @@ public class OrderController {
             attributes.addFlashAttribute("msgType", "warn");
             return "redirect:/";
         }
-        if (database.cancelOrder(code)) {
+        if (orderService.cancelOrder(code)) {
             attributes.addFlashAttribute("msg", "Отменён " + code);
             attributes.addFlashAttribute("msgType", "warn");
         } else {
@@ -196,10 +194,10 @@ public class OrderController {
      */
     @GetMapping("/report")
     public String report(Model model) {
-        model.addAttribute("readyOrders", database.listByStatus(""));
-        model.addAttribute("issuedOrders", database.listByStatus("issued"));
-        model.addAttribute("cancelledOrders", database.listByStatus("cancelled"));
-        model.addAttribute("report", database.buildReport());
+        model.addAttribute("readyOrders", orderService.listByStatus(""));
+        model.addAttribute("issuedOrders", orderService.listByStatus("issued"));
+        model.addAttribute("cancelledOrders", orderService.listByStatus("cancelled"));
+        model.addAttribute("report", orderService.buildReport());
         return "report";
     }
 
@@ -214,13 +212,13 @@ public class OrderController {
      */
     @PostMapping("/orders/cleanup")
     public String cleanup(RedirectAttributes attributes) {
-        int closed = database.countClosedOrders();
+        int closed = orderService.countClosedOrders();
         if (closed == 0) {
             attributes.addFlashAttribute("msg", "Нет выданных или отменённых заказов.");
             attributes.addFlashAttribute("msgType", "warn");
             return "redirect:/";
         }
-        int deleted = database.deleteClosedOrders();
+        int deleted = orderService.deleteClosedOrders();
         attributes.addFlashAttribute("msg", "Удалено заказов: " + deleted);
         attributes.addFlashAttribute("msgType", "ok");
         return "redirect:/";
