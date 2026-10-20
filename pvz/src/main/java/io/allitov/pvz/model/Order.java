@@ -3,6 +3,8 @@ package io.allitov.pvz.model;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.Instant;
+
 /**
  * Заказ, принятый в пункт выдачи (ПВЗ).
  *
@@ -50,5 +52,5 @@ public class Order {
     /**
      * Дата и время приёма заказа в формате {@code yyyy-MM-dd HH:mm}.
      */
-    private String createdAt;
+    private Instant createdAt;
 }
