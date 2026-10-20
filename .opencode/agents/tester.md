@@ -16,7 +16,7 @@ permissions:
     resource: "*"
     effect: deny
   - action: shell
-    resource: "./gradlew *"
+    resource: "./gradlew*"
     effect: allow
   - action: subagent
     resource: "*"

@@ -10,16 +10,16 @@ permissions:
     resource: "*"
     effect: deny
   - action: shell
-    resource: "git status *"
+    resource: "git status*"
     effect: allow
   - action: shell
-    resource: "git diff *"
+    resource: "git diff*"
     effect: allow
   - action: shell
-    resource: "git log *"
+    resource: "git log*"
     effect: allow
   - action: shell
-    resource: "git show *"
+    resource: "git show*"
     effect: allow
   - action: subagent
     resource: "*"

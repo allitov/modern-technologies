@@ -16,10 +16,10 @@ permissions:
     resource: "*"
     effect: deny
   - action: shell
-    resource: "./gradlew *"
+    resource: "./gradlew*"
     effect: allow
   - action: shell
-    resource: "git restore *"
+    resource: "git restore*"
     effect: allow
   - action: subagent
     resource: "*"
