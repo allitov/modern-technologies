@@ -34,6 +34,9 @@ public interface OrderRepository {
             + "order by created_at desc, id desc")
     List<Order> findBySearchTerm(@Bind("search") String search);
 
+    @SqlQuery(ORDER_COLUMNS + " from orders where status = :status order by created_at desc, id desc")
+    List<Order> findByStatus(@Bind("status") String status);
+
     @SqlQuery(ORDER_COLUMNS + " from orders where order_code = :code")
     Optional<Order> findByCode(@Bind("code") String code);
 
