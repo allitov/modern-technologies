@@ -8,6 +8,10 @@
 <body>
 <h1>Приёмка заказа</h1>
 
+<div class="status-bar" th:if="${msg != null}" th:classappend="${msg != null ? 'msg-' + msgType : ''}">
+    <span th:text="${msg}">Сообщение</span>
+</div>
+
 <form class="form-card" method="post" action="/orders">
     <label for="contact">Телефон или артикул:</label>
     <input type="text" id="contact" name="contact" th:value="${contact}">

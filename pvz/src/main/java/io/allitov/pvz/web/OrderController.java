@@ -2,6 +2,7 @@ package io.allitov.pvz.web;
 
 import io.allitov.pvz.model.Order;
 import io.allitov.pvz.model.OrderStatus;
+import io.allitov.pvz.exception.OrderCreationException;
 import io.allitov.pvz.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -84,7 +85,9 @@ public class OrderController {
      * название ячейки — не более 30 символов. При ошибке форма возвращается
      * с введёнными значениями и текстом ошибки, запись в базу данных не
      * выполняется. При успехе заказ сохраняется, а код заказа передаётся
-     * во flash-сообщении, после чего выполняется перенаправление на список.</p>
+     * во flash-сообщении, после чего выполняется перенаправление на список.
+     * При ошибке базы данных выполняется перенаправление на пустую форму
+     * приёмки с flash-сообщением об ошибке.</p>
      *
      * @param contact телефон получателя или артикул товара из формы.
      * @param cell название ячейки хранения из формы.
@@ -112,7 +115,14 @@ public class OrderController {
             model.addAttribute("cell", cell);
             return "order-add";
         }
-        String code = orderService.addOrder(trimmed, cell);
+        String code;
+        try {
+            code = orderService.addOrder(trimmed, cell);
+        } catch (OrderCreationException _) {
+            attributes.addFlashAttribute("msg", "Не удалось принять заказ: ошибка базы данных");
+            attributes.addFlashAttribute("msgType", "err");
+            return "redirect:/orders/new";
+        }
         attributes.addFlashAttribute("msg", "Принят заказ " + code);
         attributes.addFlashAttribute("msgType", "ok");
         return "redirect:/";

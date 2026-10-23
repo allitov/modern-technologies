@@ -3,15 +3,22 @@ package io.allitov.pvz.service.impl;
 import io.allitov.pvz.model.Order;
 import io.allitov.pvz.model.Report;
 import io.allitov.pvz.repository.OrderRepository;
+import io.allitov.pvz.exception.OrderCreationException;
 import io.allitov.pvz.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.jdbi.v3.core.JdbiException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 class OrderServiceImpl implements OrderService {
+
+    private static final Pattern LOOKS_LIKE_PHONE = Pattern.compile("^(?=(?:\\D*\\d){10})[\\d+\\-() ]+$");
 
     private final OrderRepository orderRepository;
 
@@ -51,7 +58,21 @@ class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public String addOrder(String contact, String cell) {
-        return "";
+        boolean isPhone = looksLikePhone(contact);
+        String tempCode = UUID.randomUUID().toString().replace("-", "").substring(0, 30);
+        try {
+            long id = orderRepository.insert(tempCode, isPhone ? contact : null, isPhone ? null : contact, cell);
+            String code = String.format("PVZ-%06d", id);
+            orderRepository.updateCode(id, code);
+            return code;
+        } catch (JdbiException e) {
+            throw new OrderCreationException("Failed to add order for contact '" + contact + "'", e);
+        }
+    }
+
+    private boolean looksLikePhone(String contact) {
+        return contact != null && LOOKS_LIKE_PHONE.matcher(contact).matches();
     }
 }
