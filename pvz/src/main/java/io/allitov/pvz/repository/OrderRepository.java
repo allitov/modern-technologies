@@ -31,4 +31,7 @@ public interface OrderRepository {
     @SqlUpdate("delete from orders where status in (<statuses>)")
     int deleteByStatuses(@BindList("statuses") Collection<String> statuses);
 
+    @SqlQuery("select count(*) from orders where status in (<statuses>)")
+    int countByStatuses(@BindList("statuses") Collection<String> statuses);
+
 }

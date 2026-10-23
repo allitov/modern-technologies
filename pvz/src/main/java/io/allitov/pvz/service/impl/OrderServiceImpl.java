@@ -56,7 +56,7 @@ class OrderServiceImpl implements OrderService {
 
     @Override
     public int countClosedOrders() {
-        return 0;
+        return orderRepository.countByStatuses(CLOSED_STATUSES);
     }
 
     @Override
