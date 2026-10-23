@@ -3,10 +3,12 @@ package io.allitov.pvz.repository;
 import io.allitov.pvz.model.Order;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
+import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
+import java.util.Collection;
 import java.util.Optional;
 
 @RegisterConstructorMapper(Order.class)
@@ -25,5 +27,8 @@ public interface OrderRepository {
 
     @SqlUpdate("update orders set order_code = :code where id = :id")
     void updateCode(@Bind("id") long id, @Bind("code") String code);
+
+    @SqlUpdate("delete from orders where status in (<statuses>)")
+    int deleteByStatuses(@BindList("statuses") Collection<String> statuses);
 
 }

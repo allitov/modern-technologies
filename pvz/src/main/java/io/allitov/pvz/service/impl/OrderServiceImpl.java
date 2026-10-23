@@ -1,6 +1,7 @@
 package io.allitov.pvz.service.impl;
 
 import io.allitov.pvz.model.Order;
+import io.allitov.pvz.model.OrderStatus;
 import io.allitov.pvz.model.Report;
 import io.allitov.pvz.repository.OrderRepository;
 import io.allitov.pvz.exception.OrderCreationException;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -19,6 +21,11 @@ import java.util.regex.Pattern;
 class OrderServiceImpl implements OrderService {
 
     private static final Pattern LOOKS_LIKE_PHONE = Pattern.compile("^(?=(?:\\D*\\d){10})[\\d+\\-() ]+$");
+
+    private static final List<String> CLOSED_STATUSES = List.of(
+        OrderStatus.ISSUED.name().toLowerCase(Locale.ROOT),
+        OrderStatus.CANCELLED.name().toLowerCase(Locale.ROOT)
+    );
 
     private final OrderRepository orderRepository;
 
@@ -53,8 +60,9 @@ class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public int deleteClosedOrders() {
-        return 0;
+        return orderRepository.deleteByStatuses(CLOSED_STATUSES);
     }
 
     @Override
