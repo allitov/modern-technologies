@@ -1,6 +1,7 @@
 package io.allitov.pvz.service.impl;
 
 import io.allitov.pvz.model.Order;
+import io.allitov.pvz.model.OrderFilter;
 import io.allitov.pvz.model.OrderStatus;
 import io.allitov.pvz.model.Report;
 import io.allitov.pvz.repository.OrderRepository;
@@ -46,7 +47,14 @@ class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> listOrders(String filter) {
-        return List.of();
+        return listOrders(OrderFilter.of(filter));
+    }
+
+    private List<Order> listOrders(OrderFilter filter) {
+        if (filter.getSearch() == null) {
+            return orderRepository.findAll();
+        }
+        return orderRepository.findBySearchTerm("%" + filter.getSearch() + "%");
     }
 
     @Override

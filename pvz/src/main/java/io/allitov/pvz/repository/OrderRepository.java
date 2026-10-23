@@ -9,12 +9,32 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @RegisterConstructorMapper(Order.class)
 public interface OrderRepository {
 
-    @SqlQuery("select * from orders where order_code = :code;")
+    String ORDER_COLUMNS = """
+            select
+                id,
+                order_code as code,
+                coalesce(phone, '') as phone,
+                coalesce(parcel_article, '') as article,
+                coalesce(cell, '') as cell,
+                status,
+                created_at as createdAt
+            """;
+
+    @SqlQuery(ORDER_COLUMNS + " from orders order by created_at desc, id desc")
+    List<Order> findAll();
+
+    @SqlQuery(ORDER_COLUMNS + " from orders where order_code ilike :search "
+            + "or phone ilike :search or parcel_article ilike :search "
+            + "order by created_at desc, id desc")
+    List<Order> findBySearchTerm(@Bind("search") String search);
+
+    @SqlQuery(ORDER_COLUMNS + " from orders where order_code = :code")
     Optional<Order> findByCode(@Bind("code") String code);
 
     @SqlUpdate("""
