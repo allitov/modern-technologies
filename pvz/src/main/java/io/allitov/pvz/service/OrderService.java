@@ -8,6 +8,18 @@ import java.util.List;
 
 public interface OrderService {
 
+    /**
+     * Выдаёт заказ: переводит заказ в статус {@code issued} и фиксирует дату выдачи.
+     *
+     * <p>Заказ ищется по точному коду. Выдача возможна только для заказа
+     * в статусе {@code ready}; для отсутствующего кода или заказа в другом
+     * статусе изменения не производятся. Поле ячейки хранения не изменяется.</p>
+     *
+     * @param orderCode код заказа вида {@code PVZ-000042}.
+     * @return {@code true}, если заказ выдан (статус изменён на {@code issued}
+     *         и записана дата выдачи); {@code false}, если заказ не найден
+     *         или его статус отличается от {@code ready}.
+     */
     boolean issueOrder(String orderCode);
 
     boolean cancelOrder(String orderCode);

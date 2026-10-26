@@ -8,6 +8,7 @@ import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +51,18 @@ public interface OrderRepository {
 
     @SqlUpdate("update orders set order_code = :code where id = :id")
     void updateCode(@Bind("id") long id, @Bind("code") String code);
+
+    /**
+     * Обновляет статус и дату выдачи заказа по его коду.
+     *
+     * @param code     код заказа
+     * @param status   новый статус (ключ БД, нижний регистр)
+     * @param issuedAt дата выдачи
+     * @return число обновлённых строк (0 или 1)
+     */
+    @SqlUpdate("update orders set status = :status, issued_at = :issuedAt where order_code = :code")
+    int updateStatusAndIssuedAt(@Bind("code") String code, @Bind("status") String status,
+            @Bind("issuedAt") Instant issuedAt);
 
     @SqlUpdate("delete from orders where status in (<statuses>)")
     int deleteByStatuses(@BindList("statuses") Collection<String> statuses);

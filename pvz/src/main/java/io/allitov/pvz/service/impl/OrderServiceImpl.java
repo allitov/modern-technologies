@@ -12,8 +12,10 @@ import org.jdbi.v3.core.JdbiException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -31,8 +33,22 @@ class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
 
     @Override
+    @Transactional
     public boolean issueOrder(String orderCode) {
-        return false;
+        Optional<Order> found = orderRepository.findByCode(orderCode);
+        if (found.isEmpty()) {
+            return false;
+        }
+        String ready = OrderStatus.READY.name().toLowerCase(Locale.ROOT);
+        if (!found.get().getStatus().equals(ready)) {
+            return false;
+        }
+        int updated = orderRepository.updateStatusAndIssuedAt(
+            orderCode,
+            OrderStatus.ISSUED.name().toLowerCase(Locale.ROOT),
+            Instant.now()
+        );
+        return updated > 0;
     }
 
     @Override
