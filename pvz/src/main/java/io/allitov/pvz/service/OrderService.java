@@ -36,6 +36,12 @@ public interface OrderService {
      */
     boolean cancelOrder(String orderCode);
 
+    /**
+     * Формирует сводный отчёт по количеству заказов в каждом из статусов:
+     * {@code ready}, {@code issued} и {@code cancelled}.
+     *
+     * @return заполненная структура {@link Report} с тремя счётчиками
+     */
     Report buildReport();
 
     /**

@@ -71,7 +71,14 @@ class OrderServiceImpl implements OrderService {
 
     @Override
     public Report buildReport() {
-        return null;
+        String ready = OrderStatus.READY.name().toLowerCase(Locale.ROOT);
+        String issued = OrderStatus.ISSUED.name().toLowerCase(Locale.ROOT);
+        String cancelled = OrderStatus.CANCELLED.name().toLowerCase(Locale.ROOT);
+        return Report.builder()
+            .readyCount(orderRepository.countByStatuses(List.of(ready)))
+            .issuedCount(orderRepository.countByStatuses(List.of(issued)))
+            .cancelledCount(orderRepository.countByStatuses(List.of(cancelled)))
+            .build();
     }
 
     @Override
