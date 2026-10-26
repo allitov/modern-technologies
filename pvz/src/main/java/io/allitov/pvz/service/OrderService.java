@@ -22,6 +22,18 @@ public interface OrderService {
      */
     boolean issueOrder(String orderCode);
 
+    /**
+     * Отменяет заказ: переводит заказ в статус {@code cancelled}.
+     *
+     * <p>Заказ ищется по точному коду. Отмена возможна только для заказа
+     * в статусе {@code ready}; для отсутствующего кода или заказа в другом
+     * статусе изменения не производятся. Дата выдачи не заполняется.</p>
+     *
+     * @param orderCode код заказа вида {@code PVZ-000042}.
+     * @return {@code true}, если заказ отменён (статус изменён
+     *         на {@code cancelled}); {@code false}, если заказ не найден
+     *         или его статус отличается от {@code ready}.
+     */
     boolean cancelOrder(String orderCode);
 
     Report buildReport();

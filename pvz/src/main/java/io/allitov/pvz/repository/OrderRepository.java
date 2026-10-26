@@ -64,6 +64,16 @@ public interface OrderRepository {
     int updateStatusAndIssuedAt(@Bind("code") String code, @Bind("status") String status,
             @Bind("issuedAt") Instant issuedAt);
 
+    /**
+     * Обновляет только статус заказа по его коду; остальные колонки не изменяются.
+     *
+     * @param code   код заказа
+     * @param status новый статус (ключ БД, нижний регистр)
+     * @return число обновлённых строк (0 или 1)
+     */
+    @SqlUpdate("update orders set status = :status where order_code = :code")
+    int updateStatus(@Bind("code") String code, @Bind("status") String status);
+
     @SqlUpdate("delete from orders where status in (<statuses>)")
     int deleteByStatuses(@BindList("statuses") Collection<String> statuses);
 

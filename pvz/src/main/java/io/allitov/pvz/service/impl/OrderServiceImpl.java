@@ -52,8 +52,21 @@ class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public boolean cancelOrder(String orderCode) {
-        return false;
+        Optional<Order> found = orderRepository.findByCode(orderCode);
+        if (found.isEmpty()) {
+            return false;
+        }
+        String ready = OrderStatus.READY.name().toLowerCase(Locale.ROOT);
+        if (!found.get().getStatus().equals(ready)) {
+            return false;
+        }
+        int updated = orderRepository.updateStatus(
+            orderCode,
+            OrderStatus.CANCELLED.name().toLowerCase(Locale.ROOT)
+        );
+        return updated > 0;
     }
 
     @Override
