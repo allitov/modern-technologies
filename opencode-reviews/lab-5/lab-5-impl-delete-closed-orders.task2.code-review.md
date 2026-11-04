@@ -5,13 +5,13 @@
 
 **Вердикт: PASS**
 
-- **Объект ревью:** `pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java` (изменение не закоммичено, правка в unstaged `git diff`)
-- **План-контракт:** `opencode-plans/lab-5-impl-delete-closed-orders.md`, Task2
+- **Объект ревью:** `../../pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java` (изменение не закоммичено, правка в unstaged `git diff`)
+- **План-контракт:** `../../opencode-plans/lab-5/lab-5-impl-delete-closed-orders.md`, Task2
 - **Зависимость:** Task1 (`OrderRepository.deleteByStatuses`) — застейджен, отревьюен ранее (task1 review PASS)
 
 ## Методика
 
-- `git status --porcelain=v1` по репозиторию: в `pvz/` изменены ровно два файла — `M ` `OrderRepository.java` (staged, Task1, вне скоупа) и ` M` `OrderServiceImpl.java` (unstaged, скоуп Task2). Посторонних правок и untracked-файлов в `pvz/` нет.
+- `git status --porcelain=v1` по репозиторию: в `../../pvz` изменены ровно два файла — `M ` `OrderRepository.java` (staged, Task1, вне скоупа) и ` M` `OrderServiceImpl.java` (unstaged, скоуп Task2). Посторонних правок и untracked-файлов в `pvz/` нет.
 - Построчный разбор `git diff -- <OrderServiceImpl.java>`; контекст проверен чтением файла целиком и соседних контрактных файлов: `OrderService.java`, `OrderStatus.java`, staged-дифф `OrderRepository.java`.
 - `java-rules.md` в репозитории не найден (glob пуст) — сканирование по критериям контракта из ТЗ ревью.
 - Gradle НЕ запускался (по заданию): тесты прогнал coder (`.\gradlew.bat test` — 9 passed / 5 skipped / 0 failed).

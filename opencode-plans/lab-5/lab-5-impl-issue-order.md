@@ -3,8 +3,8 @@
 > Disk source of truth. Re-read before each decision and after any compaction.
 
 **Goal:** Реализовать метод `boolean issueOrder(String orderCode)` в
-`pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java` (сейчас — заглушка
-`return false;`, строки 33–36) по спецификации `tasks/lab-5-impl-issue-order.md`: по коду заказа
+`../../pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java` (сейчас — заглушка
+`return false;`, строки 33–36) по спецификации `../tasks/lab-5/lab-5-impl-issue-order.md`: по коду заказа
 («PVZ-000001») получить из БД текущий статус; если заказ не найден или его статус не `ready` —
 вернуть `false`; иначе одним запросом перевести заказ в статус `issued` и записать дату выдачи
 (`issued_at`), вернув `true`. Постусловия: изменены `status` и `issued_at`, поле `cell` не
@@ -34,7 +34,7 @@
   `TransactionAwareDataSourceProxy` → Spring `@Transactional` на методе сервиса объединяет все
   вызовы репозитория в одну транзакцию (рабочие прецеденты: `deleteClosedOrders` :74, `addOrder`
   :80).
-- **Схема** (`pvz/src/main/resources/db/migration/V1__create_orders.sql`, единственная миграция):
+- **Схема** (`../../pvz/src/main/resources/db/migration/V1__create_orders.sql`, единственная миграция):
   `orders(order_code varchar(30) unique not null, cell varchar(30), status varchar(20) not null
   default 'ready', created_at timestamptz not null default now(), issued_at timestamptz null)` —
   **новая миграция не нужна**, колонки на месте.
@@ -52,7 +52,7 @@
   `POST /orders/{code}/issue`) ждёт `boolean`; пустой код отсекает сам; при `false` сам смотрит
   статус и показывает flash «Заказ нельзя выдать (статус: …)». Значит исключения для «не найден /
   не ready» бросать НЕЛЬЗЯ — только `false`.
-- **Тесты:** grep «issue» по `pvz/src/test` — 0 совпадений; тесты на issueOrder отсутствуют, новые
+- **Тесты:** grep «issue» по `../../pvz/src/test` — 0 совпадений; тесты на issueOrder отсутствуют, новые
   писать запрещено заданием. Регрессию ничего не ломает.
 - **Сборка:** Gradle, `cd pvz && gradlew.bat compileJava` (принятый в предыдущих контрактах
   критерий приёмки).
@@ -89,13 +89,13 @@
    - Постусловие «cell не изменяется» выполняется по построению: `cell` в SQL не фигурирует.
 3. **Out of scope:** стаб `cancelOrder` (`OrderServiceImpl.java:38-41`) не трогать (нужен
    отдельный метод репозитория — иначе перезапишет `issued_at`); контроллер, шаблоны, миграции,
-   `build.gradle.kts`, тесты — не трогать.
+   `../../build.gradle.kts`, тесты — не трогать.
 
 ## backlog
 
 - [x] **t1** — Репозиторий: метод `updateStatusAndIssuedAt`
     - **agent:** coder
-    - **inputs:** `pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java` (целиком —
+    - **inputs:** `../../pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java` (целиком —
       стиль: именованные бинды, литералов нет, ORDER_COLUMNS, прецедент `updateCode` :51-52);
       `pvz/src/main/java/io/allitov/pvz/model/Order.java:7,57` (прецедент `java.time.Instant`);
       сигнатура из секции «Архитектурное решение» п.1 этого контракта; конвенции Javadoc из
@@ -114,12 +114,12 @@
       `java.time.Instant` + метод `updateStatusAndIssuedAt`, :55-65)
 - [x] **t2** — Сервис: реализация `issueOrder` в `OrderServiceImpl`
     - **agent:** coder
-    - **inputs:** `pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java` (стаб
+    - **inputs:** `../../pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java` (стаб
       :33-36, стиль ранних возвратов, паттерн `OrderStatus.X.name().toLowerCase(Locale.ROOT)`
       :26-29, прецеденты `@Transactional` :74/:80); `pvz/src/main/java/io/allitov/pvz/service/OrderService.java:11`;
       `pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java` (`findByCode` :40-41,
       новый `updateStatusAndIssuedAt` из t1); `pvz/src/main/java/io/allitov/pvz/model/OrderStatus.java`;
-      спецификация `tasks/lab-5-impl-issue-order.md`; алгоритм из секции «Архитектурное решение»
+      спецификация `../tasks/lab-5/lab-5-impl-issue-order.md`; алгоритм из секции «Архитектурное решение»
       п.2 этого контракта.
     - **deps:** [t1]
     - **acceptance:** `issueOrder` больше не заглушка: заказ не найден → `false`; статус ≠ `ready`

@@ -8,9 +8,9 @@
 
 ## open_questions
 
-- [x] Q1: Куда поместить сам запрос `count(*)`, если «слой репозитория только сохраняет в БД, без логики»? — answer: В `OrderRepository` как тупой параметризованный запрос: список статусов приходит параметром, в репозитории нет ни статусных литералов, ни логики выбора. Это прецедент: та же фраза дословно в ТЗ `tasks/lab-5-impl-delete-closed-orders.md:18`, и sibling-метод `deleteByStatuses` сделан именно так (план `opencode-plans/lab-5-impl-delete-closed-orders.md:5,33`, ревью `opencode-reviews/lab-5-impl-delete-closed-orders.task1.code-review.md` — PASS, критерий «нет статусных литералов в репозитории»).
+- [x] Q1: Куда поместить сам запрос `count(*)`, если «слой репозитория только сохраняет в БД, без логики»? — answer: В `OrderRepository` как тупой параметризованный запрос: список статусов приходит параметром, в репозитории нет ни статусных литералов, ни логики выбора. Это прецедент: та же фраза дословно в ТЗ `tasks/lab-5-impl-delete-closed-orders.md:18`, и sibling-метод `deleteByStatuses` сделан именно так (план `opencode-plans/lab-5-impl-delete-closed-orders.md:5,33`, ревью `../../opencode-reviews/lab-5/lab-5-impl-delete-closed-orders.task1.code-review.md` — PASS, критерий «нет статусных литералов в репозитории»).
 - [x] Q2: Нужна ли `@Transactional` на read-only count? — answer: Нет. У `deleteClosedOrders` она стоит из-за записи; count — одиночный `select`, стаб аннотаций не имеет, JDBI onDemand-прокси управляет сессией сам.
-- [x] Q3: Сломает ли реализация существующие тесты (стаб возвращал 0)? — answer: Нет: grep по `pvz/src/test` даёт 2 упоминания `OrderRepository`, оба — mock-поле в `OrderServiceImplTest.java:3,36` (тестируется только `addOrder`); `OrderControllerTest` не вызывает GET `/` и POST `/orders/cleanup`; интеграционные тесты — только AddOrder и skip без Docker. Базлайн последнего прогона: 9 passed / 5 skipped / 0 failed.
+- [x] Q3: Сломает ли реализация существующие тесты (стаб возвращал 0)? — answer: Нет: grep по `../../pvz/src/test` даёт 2 упоминания `OrderRepository`, оба — mock-поле в `OrderServiceImplTest.java:3,36` (тестируется только `addOrder`); `OrderControllerTest` не вызывает GET `/` и POST `/orders/cleanup`; интеграционные тесты — только AddOrder и skip без Docker. Базлайн последнего прогона: 9 passed / 5 skipped / 0 failed.
 
 Блокирующих вопросов нет — оркестратор может стартовать.
 
@@ -19,7 +19,7 @@
 - [x] **Task1** — метод `countByStatuses` в `OrderRepository`
     - **agent:** coder
     - **inputs:**
-        - Файл: `pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java` (34 строки, JDBI 3 SqlObject интерфейс, прокси создаётся в `config/JdbiRepositoryConfig.java:11-14` через `jdbi.onDemand(...)` — добавление метода НЕ требует правок конфига).
+        - Файл: `../../pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java` (34 строки, JDBI 3 SqlObject интерфейс, прокси создаётся в `config/JdbiRepositoryConfig.java:11-14` через `jdbi.onDemand(...)` — добавление метода НЕ требует правок конфига).
         - Образец для зеркалирования — существующий `deleteByStatuses` (`OrderRepository.java:31-32`):
           ```java
           @SqlUpdate("delete from orders where status in (<statuses>)")
@@ -34,13 +34,13 @@
         - Техническая база: JDBI 3.52.1 (`pvz/build.gradle.kts:39-42`) маппит одиночную колонку на примитив `int` нативно (встроенные column mapper'ы; прецедент примитива — `long insert(...)` с `@GetGeneratedKeys` в том же файле, `:20-26`). В PG `count(*)` возвращает bigint — маппинг в `int` корректен.
         - Запрещено: строковые литералы `'issued'`/`'cancelled'`/`'ready'` в репозитории, логика выбора статусов, правки других методов (в т.ч. косметика вроде отсутствующей `;` в `updateCode:28-29` — не трогать).
     - **deps:** []
-    - **acceptance:** `.\gradlew.bat classes` (из каталога `pvz/`) проходит; в `OrderRepository` ровно один новый метод с сигнатурой и SQL точно как в контракте; в файле нет ни одного нового строкового литерала со статусами; diff ограничен одним файлом.
+    - **acceptance:** `.\gradlew.bat classes` (из каталога `../../pvz`) проходит; в `OrderRepository` ровно один новый метод с сигнатурой и SQL точно как в контракте; в файле нет ни одного нового строкового литерала со статусами; diff ограничен одним файлом.
     - **description:** Добавить в интерфейс `OrderRepository` JDBI SqlObject-метод `countByStatuses` — параметризованный `select count(*)` по списку статусов. Больше ничего не менять.
     - **touched:** pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java (+2 строки: метод `countByStatuses` после `deleteByStatuses`; ревью — opencode-reviews/lab-5-impl-count-closed-orders.task1.code-review.md, PASS)
 - [x] **Task2** — реализовать `countClosedOrders()` в `OrderServiceImpl`
     - **agent:** coder
     - **inputs:**
-        - Файл: `pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java`.
+        - Файл: `../../pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java`.
         - Заменить стаб `:57-60` (`@Override public int countClosedOrders() { return 0; }`) на делегацию:
           ```java
           @Override
@@ -65,7 +65,7 @@
     - **agent:** coder
     - **inputs:**
         - Ветка `pvz`; конвенция коммитов по истории: «pvz: <русское причастие>» (последние: «pvz: реализовал deleteClosedOrders», «pvz: реализовал addOrder»).
-        - В коммит входят ровно 2 файла: `pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java`, `pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java`.
+        - В коммит входят ровно 2 файла: `../../pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java`, `pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java`.
     - **deps:** [Task2]
     - **acceptance:** `git log -1 --oneline` показывает коммит «pvz: реализовал countClosedOrders»; `git status` чист; в коммите ровно 2 файла из `touched:` Task1/Task2.
     - **description:** Закоммитить изменения двух файлов сообщением «pvz: реализовал countClosedOrders». Ничего дополнительного не коммитить.

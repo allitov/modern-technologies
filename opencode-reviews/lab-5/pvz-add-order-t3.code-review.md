@@ -3,7 +3,7 @@
 > Отчёт code-reviewer (агентская сессия ses_ea6837f0effeMnH3JuzelDgylb); сохранён оркестратором —
 > запись из песочницы ревьюера заблокирована. Вердикт: **PASS**.
 
-**Дата:** 2026-10-20. **Файл в диффе:** `pvz/src/main/resources/templates/order-add.html` (единственный; +4 строки, 0 удалённых — вставка между `<h1>` :9 и `<form class="form-card">` :15). План-контракт `opencode-plans/pvz-add-order.md`, задача t3.
+**Дата:** 2026-10-20. **Файл в диффе:** `../../pvz/src/main/resources/templates/order-add.html` (единственный; +4 строки, 0 удалённых — вставка между `<h1>` :9 и `<form class="form-card">` :15). План-контракт `../opencode-plans/lab-5/pvz-add-order.md`, задача t3.
 
 **Методика:** сканирование по план-контракту (acceptance t3: рендеринг flash `msg`/`msgType`, отсутствие правок логики) и по шести пунктам ТЗ. Дифф получен `git diff` по файлу. Сверка с `OrderController.java`, `orders.html:11-14`, `style.css:43-68`. Gradle-прогон (`processResources`) ревьюером не выполнялся (песочница); сборка подтверждена кодером — BUILD SUCCESSFUL.
 

@@ -3,7 +3,7 @@
 > Отчёт подготовлен сабагентом `code-reviewer` (session `ses_e984835a3ffe3nm7pP32YSS4tl`), который не имел прав на запись;
 > сохранён на диск оркестратором дословно. Дата: 2026-10-23.
 
-**Файл:** `pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java`
+**Файл:** `../../pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java`
 **Дата:** 2026-10-23
 **Вердикт:** **PASS**
 
@@ -11,7 +11,7 @@
 
 - `git diff --staged --stat`: только `OrderRepository.java`, **+5 строк**, удалений нет. (Файл застейджен по регламенту ревью; расстейдживать не нужно — изменения и так были незакоммичены.)
 - `git diff --stat` (unstaged): пусто — незастейдженных правок нет.
-- Прочее в `git status`: untracked `opencode-plans/lab-5-impl-delete-closed-orders.md` и `tasks/` — артефакты рабочего процесса (план-контракт, задачи), к коду модуля `pvz` отношения не имеют.
+- Прочее в `git status`: untracked `../../opencode-plans/lab-5/lab-5-impl-delete-closed-orders.md` и `tasks/` — артефакты рабочего процесса (план-контракт, задачи), к коду модуля `pvz` отношения не имеют.
 
 ```diff
 +import org.jdbi.v3.sqlobject.customizer.BindList;
@@ -28,7 +28,7 @@
 
 **2. Нет статусных литералов и логики — ✅ PASS.** Файл прочитан полностью (34 строки): `'issued'`/`'cancelled'` отсутствуют, логики выбора статусов нет — «тупой» параметризованный запрос, список приходит параметром.
 
-**3. Ничего больше не изменено — ✅ PASS.** Staged diff — единственный файл, unstaged diff пуст; тесты, веб-слой, сервис, миграции не тронуты; внутри `pvz/` untracked-файлов нет.
+**3. Ничего больше не изменено — ✅ PASS.** Staged diff — единственный файл, unstaged diff пуст; тесты, веб-слой, сервис, миграции не тронуты; внутри `../../pvz` untracked-файлов нет.
 
 **4. Корректность `@BindList` в JDBI 3.52.1 — ✅ PASS.** Версия подтверждена (`pvz/build.gradle.kts:39-42`, `jdbi3-sqlobject:3.52.1`); пакет `org.jdbi.v3.sqlobject.customizer` верный; компиляция (BUILD SUCCESSFUL) подтверждает резолв. Плейсхолдер корректен: `@BindList` работает с угловым `<name>`, имена `statuses` ↔ `<statuses>` совпадают. `int` у `@SqlUpdate` — число затронутых строк, как требует контракт.
 

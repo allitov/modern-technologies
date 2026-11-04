@@ -1,9 +1,9 @@
 # Ревью: lab-5-impl-count-closed-orders, Task 1 — `countByStatuses` в OrderRepository
 
 - **Проект:** C:\Users\litov\JavaProjects\modern-technologies (ветка `pvz`, несохранённые рабочие изменения)
-- **Файл:** `pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java`
+- **Файл:** `../../pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java`
 - **Дата:** 2026-10-23
-- **Метод ревью:** `git status --porcelain`, `git diff` (рабочие изменения, не staged), чтение файла, проверка `pvz/build.gradle.kts`.
+- **Метод ревью:** `git status --porcelain`, `git diff` (рабочие изменения, не staged), чтение файла, проверка `../../pvz/build.gradle.kts`.
 - **Примечание:** отчёт составлен code-reviewer'ом; сохранён на диск оркестратором (среда ревьюера отклонила запись файла, вердикт и текст — дословно от ревьюера).
 
 ## Суть изменения

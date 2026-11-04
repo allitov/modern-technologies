@@ -1,8 +1,8 @@
 # Ревью: lab-5-impl-count-closed-orders, Task 2 — `countClosedOrders()` в OrderServiceImpl
 
 - **Проект:** modern-technologies (модуль pvz), ветка `pvz`, несохранённые рабочие изменения
-- **Файл:** `pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java`
-- **План:** `opencode-plans/lab-5-impl-count-closed-orders.md`, Task2
+- **Файл:** `../../pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java`
+- **План:** `../../opencode-plans/lab-5/lab-5-impl-count-closed-orders.md`, Task2
 - **Дата:** 2026-10-23
 - **Примечание:** отчёт составлен code-reviewer'ом; сохранён на диск оркестратором (среда ревьюера отклонила запись файла, текст — дословно от ревьюера).
 

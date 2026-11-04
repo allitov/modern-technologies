@@ -34,7 +34,7 @@
 - [x] **t1** — Реализовать addOrder: исключение + SQL-методы репозитория + сервис (@Transactional) + catch в контроллере
     - **agent:** coder
     - **inputs:**
-        - **Точка правки 1 — `pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java`** (57 строк):
+        - **Точка правки 1 — `../../pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java`** (57 строк):
           `@Service @RequiredArgsConstructor class OrderServiceImpl implements OrderService` (package-private),
           поле `private final OrderRepository orderRepository;` (:16), заглушка
           `addOrder` (:53-56) — заменить тело. Туда же добавить: приватный статический
@@ -54,7 +54,7 @@
           телефон или артикул), `@param cell` (код ячейки, может быть пустым, ≤ 30), `@return` сгенерированный
           код вида `PVZ-000042`, `@throws OrderCreationException` при ошибке БД. Предусловия — на вызывающем
           (контроллер), в сервисе НЕ дублировать валидацию длины.
-        - **Точка правки 3 — `pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java`** (16 строк,
+        - **Точка правки 3 — `../../pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java`** (16 строк,
           Jdbi SqlObject, `@RegisterConstructorMapper(Order.class)`): добавить два метода (SQL — только здесь):
             ```java
             @SqlUpdate("insert into orders (order_code, phone, parcel_article, cell) "
@@ -73,7 +73,7 @@
         - **Новый файл 4 — `pvz/src/main/java/io/allitov/pvz/service/OrderCreationException.java`**:
           `public class OrderCreationException extends RuntimeException`, конструктор
           `(String message, Throwable cause)`, Javadoc на русском.
-        - **Точка правки 5 — `pvz/src/main/java/io/allitov/pvz/web/OrderController.java`**, метод `add()`
+        - **Точка правки 5 — `../../pvz/src/main/java/io/allitov/pvz/web/OrderController.java`**, метод `add()`
           (:95-119): обернуть `orderService.addOrder(trimmed, cell)` (:115) в
           `try { ... } catch (OrderCreationException e)`: flash-атрибуты
           `msg` = «Не удалось принять заказ: ошибка базы данных» (точную формулировку — в стиле существующих
@@ -107,14 +107,14 @@
       `PVZ-%06d`, обновление кода, возврат кода, оборачивание `JdbiException` в `OrderCreationException`);
       добавить Javadoc в интерфейс; обернуть вызов в `OrderController.add()` try/catch с flash-ошибкой.
     - **touched:**
-        - `pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java`
-        - `pvz/src/main/java/io/allitov/pvz/service/OrderService.java`
-        - `pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java`
+        - `../../pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java`
+        - `../../pvz/src/main/java/io/allitov/pvz/service/OrderService.java`
+        - `../../pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java`
         - `pvz/src/main/java/io/allitov/pvz/service/OrderCreationException.java` (новый файл)
-        - `pvz/src/main/java/io/allitov/pvz/web/OrderController.java`
+        - `../../pvz/src/main/java/io/allitov/pvz/web/OrderController.java`
     - **статус (оркестратор):** приёмка выполнена — `gradlew.bat compileJava compileTestJava` BUILD
       SUCCESSFUL (задачи `test-compile` в Gradle 9.8.1 нет, использован аналог `compileTestJava`);
-      ревью PASS — `opencode-reviews/pvz-add-order-t1.code-review.md`. Отклонения от плана: (1) метод
+      ревью PASS — `../../opencode-reviews/lab-5/pvz-add-order-t1.code-review.md`. Отклонения от плана: (1) метод
       `addOrder` в имплементации `public`, а не package-private — Java запрещает сужать видимость при
       `@Override` public-метода интерфейса; транзакционность через прокси не нарушена (подтверждено
       ревью); (2) сообщение исключения на английском (правила проекта), Javadoc — на русском.
@@ -130,7 +130,7 @@
           Mockito доступен транзитивно через spring-boot-test стартеры; для Boot 4 — `@MockitoBean` (не
           `@MockBean`). Testcontainers: `testcontainers-postgresql` + `spring-boot-testcontainers` уже в
           `build.gradle.kts:27-29`.
-        - **Тест 1 (unit, сервис):** `pvz/src/test/java/io/allitov/pvz/service/impl/OrderServiceImplTest.java`
+        - **Тест 1 (unit, сервис):** `../../pvz/src/test/java/io/allitov/pvz/service/impl/OrderServiceImplTest.java`
           — мок `OrderRepository` (Mockito), реальный `OrderServiceImpl`. Кейсы (параметризованно):
             - телефон («+79991234567», «8 (999) 123-45-67») → `insert` вызван с `(anyString(), eq(contact),
               isNull(), eq(cell))`, артикул («ART-123», «ABC123») → `(anyString(), isNull(), eq(contact),
@@ -165,18 +165,18 @@
       @WebMvcTest catch-ветки контроллера), прогнать `gradlew.bat test`, при необходимости починить
       `PvzApplicationTests` через Testcontainers-источник; доложить список тестов и результат.
     - **touched:**
-        - `pvz/src/test/java/io/allitov/pvz/service/impl/OrderServiceImplTest.java` (новый)
-        - `pvz/src/test/java/io/allitov/pvz/service/impl/OrderServiceImplIntegrationTest.java` (новый;
+        - `../../pvz/src/test/java/io/allitov/pvz/service/impl/OrderServiceImplTest.java` (новый)
+        - `../../pvz/src/test/java/io/allitov/pvz/service/impl/OrderServiceImplIntegrationTest.java` (новый;
           суффикс `*Test` — попадает в дефолтную задачу `test`)
-        - `pvz/src/test/java/io/allitov/pvz/web/OrderControllerTest.java` (новый)
-        - `pvz/src/test/java/io/allitov/pvz/PvzApplicationTests.java` (Testcontainers + @ServiceConnection
+        - `../../pvz/src/test/java/io/allitov/pvz/web/OrderControllerTest.java` (новый)
+        - `../../pvz/src/test/java/io/allitov/pvz/PvzApplicationTests.java` (Testcontainers + @ServiceConnection
           + `@Testcontainers(disabledWithoutDocker=true)`)
-        - `pvz/src/main/java/io/allitov/pvz/model/Order.java` (фикс из red-test-раунда: +
+        - `../../pvz/src/main/java/io/allitov/pvz/model/Order.java` (фикс из red-test-раунда: +
           `@AllArgsConstructor` — публичный all-args конструктор для JDBI ConstructorMapper)
     - **статус (оркестратор):** `gradlew.bat test` — 14/14 зелёных (7 unit + 2 контроллер + 4 интеграция +
       contextLoads); ассерты PVZ-000001/000002, `status='ready'`, XOR phone/article, cell, коммит из
-      отдельного соединения — подтверждены. Ревью: PASS — `opencode-reviews/pvz-add-order-t2.test-review.md`;
-      PASS — `opencode-reviews/pvz-add-order-fix-order.code-review.md`. Red-test-раунд 1/2: интеграция
+      отдельного соединения — подтверждены. Ревью: PASS — `../../opencode-reviews/lab-5/pvz-add-order-t2.test-review.md`;
+      PASS — `../../opencode-reviews/lab-5/pvz-add-order-fix-order.code-review.md`. Red-test-раунд 1/2: интеграция
       вскрыла баг — классовая `@RegisterConstructorMapper(Order.class)` (JDBI 3.52.1 жадно строит
       метаданные при любом вызове прокси) × недоступный конструктор `Order` → `IllegalAccessException`
       на любом `POST /orders` (500 сырым RuntimeException, мимо catch контроллера); fix coder'ом
@@ -188,7 +188,7 @@
 - [x] **t3** — [follow-up из code-review t1, находка F1] Рендеринг flash-ошибки на форме приёмки
     - **agent:** coder
     - **inputs:**
-        - **Находка F1** (`opencode-reviews/pvz-add-order-t1.code-review.md`): `OrderController.add()`
+        - **Находка F1** (`../../opencode-reviews/lab-5/pvz-add-order-t1.code-review.md`): `OrderController.add()`
           кладёт flash `msg`/`msgType=err`, но шаблон
           `pvz/src/main/resources/templates/order-add.html` их не рендерит (только
           `contactError`/`cellError`) — при ошибке БД пользователь видит пустую форму без сообщения.
@@ -202,10 +202,10 @@
     - **description:** Добавить в `order-add.html` вывод flash-сообщения `msg`/`msgType` по образцу
       `orders.html:11-13`; логику не трогать.
     - **touched:**
-        - `pvz/src/main/resources/templates/order-add.html` (+4 строки: статус-бар
+        - `../../pvz/src/main/resources/templates/order-add.html` (+4 строки: статус-бар
           `th:if="${msg != null}"` + `th:classappend` `msg-<msgType>` + `th:text` между `<h1>` и формой)
     - **статус (оркестратор):** `gradlew.bat compileJava processResources` — BUILD SUCCESSFUL;
-      ревью PASS — `opencode-reviews/pvz-add-order-t3.code-review.md` (имена flash-атрибутов сверены
+      ревью PASS — `../../opencode-reviews/lab-5/pvz-add-order-t3.code-review.md` (имена flash-атрибутов сверены
       с контроллером, классы есть в style.css, ветка `count` из orders.html осознанно не скопирована).
       Пробел покрытия: Thymeleaf-рендеринг автотестом не покрыт — осознанный, отмечен человеку.
 
@@ -214,7 +214,7 @@
 - Источники разведки: `OrderServiceImpl.java:53-56`, `OrderService.java:24`, `OrderRepository.java:10-16`,
   `JdbiConfig.java:24-32`, `JdbiRepositoryConfig.java:11-14`, `V1__create_orders.sql:1-10`,
   `OrderController.java:95-119`, `build.gradle.kts:21-43`, `Order.java:17-56`;
-  план-предшественник `opencode-plans/pvz-lab5.md` (:21 looksLikePhone, :37 рецепт addOrder, :44 конвенции,
+  план-предшественник `pvz-lab5.md` (:21 looksLikePhone, :37 рецепт addOrder, :44 конвенции,
   :56 валидация в контроллере) — его архитектура `DatabaseImpl` устарела (в дереве service/repository-split),
   рецепт транзакции перенесён в сервис по решению Q1.
 - Вне скоупа (сознательно): реализация остальных 7 методов сервиса, правка комментариев V1-миграции

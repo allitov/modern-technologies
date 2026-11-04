@@ -1,7 +1,7 @@
 # Code review: Task1 — метод `updateStatus` в `OrderRepository`
 
-**Файл:** `pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java`
-**План:** `opencode-plans/lab-5-impl-cancel-order.md`, Task1
+**Файл:** `../../pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java`
+**План:** `../opencode-plans/lab-5/lab-5-impl-cancel-order.md`, Task1
 **Дата:** 2026-10-26
 **Ревьюер:** code-reviewer (сессия ses_e894586e8ffeJRn4KmSpOEx5fF)
 

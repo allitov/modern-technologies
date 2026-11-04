@@ -14,12 +14,12 @@
 
 | Файл | Изменение | Отнесение |
 |---|---|---|
-| `pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java` | +15/−1 — стаб `cancelOrder` заменён реализацией | Task2 (целевой) |
-| `pvz/src/main/java/io/allitov/pvz/service/OrderService.java` | +12 — Javadoc к `cancelOrder` | Task2 (целевой) |
-| `pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java` | +10 — метод `updateStatus` | Task1, уже отревьюен (`opencode-reviews/task1-updatestatus.code-review.md`) — дефектом не считается |
-| `opencode-plans/lab-5-impl-cancel-order.md` | +107 — план (док) | документация, не код |
-| `tasks/lab-5-impl-cancel-order.md` | +16 — постановка задачи (док) | документация, не код |
-| `opencode-reviews/task1-updatestatus.code-review.md` | +41 — отчёт ревью Task1 (док) | документация, не код |
+| `../../pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java` | +15/−1 — стаб `cancelOrder` заменён реализацией | Task2 (целевой) |
+| `../../pvz/src/main/java/io/allitov/pvz/service/OrderService.java` | +12 — Javadoc к `cancelOrder` | Task2 (целевой) |
+| `../../pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java` | +10 — метод `updateStatus` | Task1, уже отревьюен (`task1-updatestatus.code-review.md`) — дефектом не считается |
+| `../../opencode-plans/lab-5/lab-5-impl-cancel-order.md` | +107 — план (док) | документация, не код |
+| `../../tasks/lab-5/lab-5-impl-cancel-order.md` | +16 — постановка задачи (док) | документация, не код |
+| `task1-updatestatus.code-review.md` | +41 — отчёт ревью Task1 (док) | документация, не код |
 
 **Проверка п.3 (scope):** посторонних кодовых изменений нет. Веб-слой (`OrderController.java`, шаблоны) не затронут — в диффе отсутствует. Мёртвого кода не добавлено: стаб `return false;` полностью заменён, новых неиспользуемых импортов/методов нет.
 

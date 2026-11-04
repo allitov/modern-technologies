@@ -10,11 +10,11 @@
 
 ## Объём проверки
 
-Модуль `pvz`, Task1 плана `opencode-plans/lab-5-impl-build-report.md`. Проверены некоммитнутые изменения
+Модуль `pvz`, Task1 плана `../../opencode-plans/lab-5/lab-5-impl-build-report.md`. Проверены некоммитнутые изменения
 рабочего дерева (`git status --porcelain` + `git diff`); изменены ровно два файла, других правок в коде нет:
 
-- `pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java`
-- `pvz/src/main/java/io/allitov/pvz/service/OrderService.java`
+- `../../pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java`
+- `../../pvz/src/main/java/io/allitov/pvz/service/OrderService.java`
 
 Примечание: `java-rules.md` в репозитории отсутствует, поэтому проверка выполнена по контракту плана
 (acceptance-критерии) и общим критериям корректности Java/Spring/Jdbi.
@@ -34,7 +34,7 @@
 | Правильные поля builder'а, без перепутывания | OK | `readyCount`←ready, `issuedCount`←issued, `cancelledCount`←cancelled (`OrderServiceImpl.java:78–80`); поля `int readyCount/issuedCount/cancelledCount`, `@Data @Builder` — `Report.java:12–29` |
 | Новых импортов нет | OK | Diff не содержит правок импортов; `Report` (:6), `OrderStatus` (:5), `List` (:16), `Locale` (:17) уже были |
 | `OrderRepository.java` не изменён | OK | Файл отсутствует в `git status --porcelain`; :80–81 соответствуют спецификации: `@SqlQuery("select count(*) from orders where status in (<statuses>)") int countByStatuses(@BindList("statuses") Collection<String> statuses);` — сигнатура совпадает с вызовами (`List.of(String)` — валидный `Collection<String>`; непустой список, проблема пустого `in ()` в Jdbi `@BindList` не возникает) |
-| `src/test` не тронут, тесты не писались | OK | В `git status --porcelain` нет ни одного файла под `pvz/src/test` |
+| `src/test` не тронут, тесты не писались | OK | В `git status --porcelain` нет ни одного файла под `../../pvz/src/test` |
 | Контроллер не изменён | OK | `web/OrderController.java:210` (`model.addAttribute("report", orderService.buildReport())`) — вне diff'а; шаблон `templates/report.html:12–14` разыменовывает `report.readyCount/issuedCount/cancelledCount`, теперь заполненные → 500 из-за `report == null` устранён |
 | Javadoc у `OrderService.buildReport()` | OK | `OrderService.java:39–45`: текст в точности как в плане, корректно оформлен (`{@code}`, `{@link Report}`; `Report` импортирован на :5), по-русски, в стиле остальных методов файла |
 | `countClosedOrders()`/`deleteClosedOrders()` без Javadoc | OK | `OrderService.java:77` и :79 — без изменений (вне объёма по плану, намеренно) |

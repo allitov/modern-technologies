@@ -13,8 +13,8 @@
 **Вердикт: PASS**
 
 **Diff:** staged-изменения (`git add -A` → `git diff --staged`), файлы задачи t2:
-- `pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java` (реализация `issueOrder`)
-- `pvz/src/main/java/io/allitov/pvz/service/OrderService.java` (Javadoc в интерфейсе)
+- `../../pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java` (реализация `issueOrder`)
+- `../../pvz/src/main/java/io/allitov/pvz/service/OrderService.java` (Javadoc в интерфейсе)
 
 В staged также попали `OrderRepository.java` (задача t1 — отревьюена ранее, здесь использована
 только для проверки постусловия), plan/review/task markdown-файлы (артефакты процесса).
@@ -61,7 +61,7 @@ Grep по `pvz/.../service/**`: `cell` только в предсуществу�
 
 ### 5. Чужой код не тронут — OK
 `git diff --staged --stat`: из java-файлов изменены только `OrderRepository.java` (t1),
-`OrderService.java`, `OrderServiceImpl.java`. Контроллер, шаблоны, миграции, `build.gradle.kts`,
+`OrderService.java`, `OrderServiceImpl.java`. Контроллер, шаблоны, миграции, `../../build.gradle.kts`,
 тесты — не изменены. `cancelOrder` (:54-57) и `buildReport` (:59-62) — прежние заглушки,
 не затронуты; остальные методы не изменены.
 
@@ -74,7 +74,7 @@ Grep по `pvz/.../service/**`: `cell` только в предсуществу�
 SQL (`OrderRepository.java:63`): ровно требуемая строка, `cell` в SQL отсутствует —
 постусловие выполнено по построению.
 
-### 8. Сводимость со спецификацией `tasks/lab-5-impl-issue-order.md` — OK
+### 8. Сводимость со спецификацией `../../tasks/lab-5/lab-5-impl-issue-order.md` — OK
 | Требование | Реализация |
 |---|---|
 | «получить текущий статус заказа с указанным кодом» | `findByCode` (:38) |
@@ -92,7 +92,7 @@ out-of-scope (`cancelOrder` и пр.) не тронут ✓.
 ## Находки
 
 ### Нарушений нет
-Scan `.opencode/rules/java-rules.md` по изменённым строкам: `@UtilityClass` (класс не
+Scan `../../.opencode/rules/java-rules.md` по изменённым строкам: `@UtilityClass` (класс не
 создавался; `OrderServiceImpl` — предсуществующий Spring `@Service`), английские тексты
 исключений (новых исключений нет), логирование (не добавлялось) — не применимы.
 

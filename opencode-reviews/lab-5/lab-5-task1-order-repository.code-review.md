@@ -2,8 +2,8 @@
 
 - **Дата:** 2026-10-23
 - **Ревьюер:** GLM-5.3-Flash (субагент-ревьюер, только чтение)
-- **Объект:** `pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java` — незакоммиченные изменения рабочего дерева (застейджены через `git add -A`, ревью по `git diff --staged`)
-- **Контракт:** спека оркестратора + план `opencode-plans/lab-5-impl-list-orders.md` (Task1) + `tasks/lab-5-impl-list-orders.md:19`
+- **Объект:** `../../pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java` — незакоммиченные изменения рабочего дерева (застейджены через `git add -A`, ревью по `git diff --staged`)
+- **Контракт:** спека оркестратора + план `../../opencode-plans/lab-5/lab-5-impl-list-orders.md` (Task1) + `tasks/lab-5-impl-list-orders.md:19`
 - **Правила:** `java-rules.md` в корне репозитория отсутствует (проверено glob) — скан по критериям задачи и общим правилам.
 - **Примечание оркестратора:** субагент-ревьюер не смог записать файл (пермишены сессии); отчёт дословно сохранён оркестратором.
 
@@ -25,7 +25,7 @@
  tasks/lab-5-impl-list-orders.md                    | 19 +++++
 ```
 
-- **Код** затронут ровно в одном файле — `OrderRepository.java` (+14/−1). Ни один другой `.java` не изменён; `git diff --staged` по `pvz/` содержит единственный хунк этого файла.
+- **Код** затронут ровно в одном файле — `OrderRepository.java` (+14/−1). Ни один другой `.java` не изменён; `git diff --staged` по `../../pvz` содержит единственный хунк этого файла.
 - Два дополнительных файла — markdown-артефакты планирования (план и постановка задачи), не код продукта. Ключевой риск «кодер не смог выполнить git status и мог задеть чужие файлы» снят. Деталь для коммитящего человека — в находке N1.
 
 ## 2. Пословная сверка SQL с контрактом (критерии 2, 6) — СООТВЕТСТВУЕТ
@@ -44,7 +44,7 @@
 
 ## 4. Order.java не изменён (критерий 4) — СООТВЕТСТВУЕТ
 
-`pvz/src/main/java/io/allitov/pvz/model/Order.java` отсутствует в `git status` и в staged-диффе пуст. Требование плана «Order.java не менять» (`opencode-plans/lab-5-impl-list-orders.md:19`) выполнено.
+`../../pvz/src/main/java/io/allitov/pvz/model/Order.java` отсутствует в `git status` и в staged-диффе пуст. Требование плана «Order.java не менять» (`opencode-plans/lab-5-impl-list-orders.md:19`) выполнено.
 
 ## 5. Корректность маппинга (критерий 5) — СООТВЕТСТВУЕТ
 
@@ -58,7 +58,7 @@
 - **PASS [OrderRepository.java:22-23,25-28]** `findAll`/`findBySearchTerm` дословно по контракту; bind-параметры, инъекции нет; сортировка `created_at desc, id desc` даёт детерминированный порядок при равных `created_at`.
 - **PASS [OrderRepository.java:30-31]** `findByCode` переведён с `select *` на `ORDER_COLUMNS` — устранён задокументированный дефект `pvz-add-order-fix-order.code-review.md:41`.
 - **PASS [OrderRepository.java:12]** Импорт `java.util.List` добавлен под возвращаемые типы; `Optional`/`Collection` использовались ранее.
-- **N1 [к сведению, для коммитящего]** Рабочее дерево содержит два незатреканных markdown-артефакта: `opencode-plans/lab-5-impl-list-orders.md` и `tasks/lab-5-impl-list-orders.md`. Это не код и не часть диффа Task1, но при коммите решите сознательно: включать их в коммит или нет. Буквальная формулировка acceptance «git status не показывает изменений вне OrderRepository.java» выполнена в части кода; файлы планирования — санкционированные артефакты сессии.
+- **N1 [к сведению, для коммитящего]** Рабочее дерево содержит два незатреканных markdown-артефакта: `../../opencode-plans/lab-5/lab-5-impl-list-orders.md` и `../tasks/lab-5/lab-5-impl-list-orders.md`. Это не код и не часть диффа Task1, но при коммите решите сознательно: включать их в коммит или нет. Буквальная формулировка acceptance «git status не показывает изменений вне OrderRepository.java» выполнена в части кода; файлы планирования — санкционированные артефакты сессии.
 - **N2 [не проверяемо ревьюером]** Сборка/тесты не прогонялись: вызов `gradlew compileJava` заблокирован сандбоксом (прецедент — `pvz-add-order-fix-order.code-review.md:43`). Статически синтаксис валиден: конкатенация compile-time констант допустима в значении аннотации. Рантайм-проверка маппинга чтения ещё ни разу не выполнялась — ручная проверка после Task2 уже запланирована (`opencode-plans/lab-5-impl-list-orders.md:96`). Регрессию прогнал тестер отдельно: 14 тестов GREEN, покрытием изменённой ветки тесты не обладают.
 - **N3 [к сведению, вне скоупа диффа]** Устаревшая javadoc `Order.java:16` («строкой yyyy-MM-dd HH:mm») противоречит полю `Instant` (`Order.java:57`). Файл не менялся, дефект вне диффа и уже зафиксирован вне скоупа в плане (`opencode-plans/lab-5-impl-list-orders.md:98`). Действий не требует.
 

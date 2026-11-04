@@ -26,19 +26,19 @@
 - [x] **Task1** — Реализовать `buildReport()` в `OrderServiceImpl` (+ Javadoc в `OrderService`)
     - **agent:** coder
     - **inputs:**
-        - Файл реализации: `pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java`, заглушка на стр. 72–75:
+        - Файл реализации: `../../pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java`, заглушка на стр. 72–75:
           ```java
           @Override
           public Report buildReport() {
               return null;
           }
           ```
-        - Интерфейс: `pvz/src/main/java/io/allitov/pvz/service/OrderService.java`, стр. 39 `Report buildReport();` —
+        - Интерфейс: `../../pvz/src/main/java/io/allitov/pvz/service/OrderService.java`, стр. 39 `Report buildReport();` —
           единственный метод без Javadoc; все остальные методы задокументированы по-русски.
-        - Репозиторий (НЕ МЕНЯТЬ): `pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java`, стр. 80–81:
+        - Репозиторий (НЕ МЕНЯТЬ): `../../pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java`, стр. 80–81:
           `@SqlQuery("select count(*) from orders where status in (<statuses>)")
           int countByStatuses(@BindList("statuses") Collection<String> statuses);`
-        - Модель: `pvz/src/main/java/io/allitov/pvz/model/Report.java` — `@Data @Builder`, поля
+        - Модель: `../../pvz/src/main/java/io/allitov/pvz/model/Report.java` — `@Data @Builder`, поля
           `int readyCount, issuedCount, cancelledCount`; `pvz/src/main/java/io/allitov/pvz/model/OrderStatus.java` —
           enum `READY, ISSUED, CANCELLED`; ключи БД — lowercase-имена констант.
         - Стиль класса (обязательно соблюсти): статусы как `OrderStatus.X.name().toLowerCase(Locale.ROOT)` —
@@ -84,15 +84,15 @@
       `Report.builder()` (поля `readyCount`, `issuedCount`, `cancelledCount`). Добавить Javadoc к объявлению
       `buildReport()` в `OrderService`. Больше ничего не менять.
     - **touched:**
-        - `pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java` — заглушка `buildReport()`
+        - `../../pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java` — заглушка `buildReport()`
           (бывш. :72–75) заменена реализацией (:72–82)
-        - `pvz/src/main/java/io/allitov/pvz/service/OrderService.java` — добавлен Javadoc к `buildReport()`
+        - `../../pvz/src/main/java/io/allitov/pvz/service/OrderService.java` — добавлен Javadoc к `buildReport()`
           (:39–45)
-    - **result (2026-10-26):** PASS. Компиляция: `pvz` — самостоятельная Gradle-сборка (корневой `settings.gradle.kts`
+    - **result (2026-10-26):** PASS. Компиляция: `pvz` — самостоятельная Gradle-сборка (корневой `../../settings.gradle.kts`
       включает только `todo-app`), фактическая команда `.\gradlew.bat compileJava` в `pvz\` → BUILD SUCCESSFUL
       (acceptance-формула `:pvz:compileJava` из корня неприменима структурно). Regression (unit-only):
       `.\gradlew.bat test --tests "io.allitov.pvz.service.impl.OrderServiceImplTest" --tests "io.allitov.pvz.web.OrderControllerTest"`
-      → 9/9 green. Review: PASS → `opencode-reviews/lab-5-task1-buildreport.code-review.md`. Флаги человеку:
+      → 9/9 green. Review: PASS → `../../opencode-reviews/lab-5/lab-5-task1-buildreport.code-review.md`. Флаги человеку:
       (1) `buildReport()` не покрыт ни одним тестом (unit/integration/controller — ноль; тесты запрещены задачей) —
       зелёный regression доказывает только отсутствие поломки соседей, не корректность новой ветки;
       (2) `countClosedOrders()` (:77) и `deleteClosedOrders()` (:79) в `OrderService` тоже без Javadoc — вне объёма

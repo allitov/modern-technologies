@@ -3,14 +3,14 @@
 > Отчёт code-reviewer (агентская сессия ses_ea6a6cb56ffeD36mu2PB9C4U99); сохранён оркестратором —
 > запись из песочницы ревьюера заблокирована. Вердикт: **PASS**.
 
-**Дата:** 2026-10-20. **Область:** незакоммиченный дифф `pvz/src/main/java/io/allitov/pvz/model/Order.java` (+2 строки: `import lombok.AllArgsConstructor` — :3, `@AllArgsConstructor` — :20). Контекст: план-контракт `opencode-plans/pvz-add-order.md`, задача t2; интеграционные тесты вскрыли, что `addOrder` падал end-to-end (`IllegalAccessException: member is private to package: Order.<init>`, обёрнутый в сырой `RuntimeException`).
+**Дата:** 2026-10-20. **Область:** незакоммиченный дифф `../../pvz/src/main/java/io/allitov/pvz/model/Order.java` (+2 строки: `import lombok.AllArgsConstructor` — :3, `@AllArgsConstructor` — :20). Контекст: план-контракт `../opencode-plans/lab-5/pvz-add-order.md`, задача t2; интеграционные тесты вскрыли, что `addOrder` падал end-to-end (`IllegalAccessException: member is private to package: Order.<init>`, обёрнутый в сырой `RuntimeException`).
 
 **Уточнение скоупа (факты по git, расходится с описанием фикса в постановке):**
 - `public class Order` существовал **с первого коммита** `c7bd39f` — в дифф фикса он не входит (в постановке указан как часть диффа — неточно).
 - Закоммиченная сегодня часть правки `466781f` «pvz: поправил класс Order» (17:44 +0700) — это `createdAt: String → Instant` (+import `java.time.Instant`), не видимость класса.
 - Незакоммиченный (ревьюируемый) дифф — **только `@AllArgsConstructor` + import**, т.е. публикация all-args конструктора. Вердикт относится именно к этому диффу.
 
-**Методика:** `java-rules.md` найден в `.opencode/rules/java-rules.md` — правила просканированы. Механика JDBI проверена по исходникам тега **v3.52.1** (совпадает с `build.gradle.kts:39-41`): `ConstructorMapper.java`, `JdbiConstructors.java`, `ConstructorInstanceFactory.java`; семантика Lombok — по официальной документации. Прогон `gradlew.bat` ревьюером не выполнялся (запрещён песочницей); компилируемость и зелёность подтверждены прогоном тестера (14/14), здесь зафиксировано как «не проверяемо ревьюером».
+**Методика:** `java-rules.md` найден в `../../.opencode/rules/java-rules.md` — правила просканированы. Механика JDBI проверена по исходникам тега **v3.52.1** (совпадает с `build.gradle.kts:39-41`): `ConstructorMapper.java`, `JdbiConstructors.java`, `ConstructorInstanceFactory.java`; семантика Lombok — по официальной документации. Прогон `gradlew.bat` ревьюером не выполнялся (запрещён песочницей); компилируемость и зелёность подтверждены прогоном тестера (14/14), здесь зафиксировано как «не проверяемо ревьюером».
 
 ## Проверка вопросов постановки
 

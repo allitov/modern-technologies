@@ -6,9 +6,9 @@
 пустая/blank строка → все заказы; непустой статус → только заказы с `status = :status`; поля выборки — как в
 `listOrders` (константа `ORDER_COLUMNS`); сортировка «свежие сверху» — `order by created_at desc, id desc`. Данные не
 изменяются (read-only). Условная логика (ветвление по пустоте статуса) живёт в сервисе; репозиторий — только SQL,
-без логики (требование из `tasks/lab-5-impl-listByStatus.md`). Контроллер `GET /report` и шаблон `report.html` не
+без логики (требование из `../../tasks/lab-5/lab-5-impl-listByStatus.md`). Контроллер `GET /report` и шаблон `report.html` не
 меняются — метод уже вызывается (`OrderController.java:205-212`). Тесты НЕ пишутся (явный запрет в задании; покрытие
-метода запланировано позже в t5 лабораторного плана `opencode-plans/pvz-lab5.md`).
+метода запланировано позже в t5 лабораторного плана `pvz-lab5.md`).
 
 **active:** done (все задачи выполнены)
 
@@ -19,7 +19,7 @@
   `opencode-plans/pvz-lab5.md:40` («пустая строка — все, вкладка „Принято“ показывает ВСЕ заказы, так в C++
   `dialogs.cpp:202-220»`) и чек-листом `:122` («Принято» — 3 при одном issued и одном cancelled). Контроллер передаёт
   `""` для вкладки «Принято» сознательно.
-- [x] Q2: Пинют ли существующие тесты поведение метода? — answer: **нет**. Ни один тест в `pvz/src/test` не вызывает
+- [x] Q2: Пинют ли существующие тесты поведение метода? — answer: **нет**. Ни один тест в `../../pvz/src/test` не вызывает
   `listByStatus`/`buildReport`/`GET /report`; вся сюита зелёная и с заглушкой. Писать тесты запрещено заданием.
 - [x] Q3: Куда положить условный фильтр? — answer: ветвление в `OrderServiceImpl` (зеркалит структуру `listOrders`:
   `findAll()` vs `findBySearchTerm(...)`); в репозитории — один статический SQL-запрос без ветвлений.
@@ -29,9 +29,9 @@
 - [x] **Task1** — Реализовать `listByStatus`: `OrderRepository.findByStatus` + тело метода в `OrderServiceImpl`
     - **agent:** coder
     - **inputs:**
-        - Спецификация: `tasks/lab-5-impl-listByStatus.md`; семантика `""` = все заказы (см. open_questions Q1).
+        - Спецификация: `../../tasks/lab-5/lab-5-impl-listByStatus.md`; семантика `""` = все заказы (см. open_questions Q1).
         - Файлы к изменению (только эти два + javadoc в интерфейсе):
-            - `pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java` — добавить метод (после `findBySearchTerm`):
+            - `../../pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java` — добавить метод (после `findBySearchTerm`):
               ```java
               @SqlQuery(ORDER_COLUMNS + " from orders where status = :status order by created_at desc, id desc")
               List<Order> findByStatus(@Bind("status") String status);
@@ -56,7 +56,7 @@
               ("ready"/"issued"/"cancelled"); сортировка по created_at, свежие сверху; данные не изменяются».
         - Запрещено: менять `src/test` (тесты писать не надо — прямое требование задания); трогать контроллер,
           `report.html`, заглушки `buildReport`/`issueOrder`/`cancelOrder` (другие задачи лабораторной).
-        - Проверка: из каталога `pvz/` выполнить `./gradlew test` (конвенция `.opencode/rules/build-commands.md:6`).
+        - Проверка: из каталога `../../pvz` выполнить `./gradlew test` (конвенция `.opencode/rules/build-commands.md:6`).
           ВАЖНО: `PvzApplicationTests`/`OrderServiceImplIntegrationTest` требуют Docker — без него они молча
           пропускаются (`disabledWithoutDocker = true`), это НЕ провал; отчитаться, что именно прогнано.
           ВАЖНО: не пытаться проверять через `GET /report` — страница уронится с 500 из-за не связанной с этой задачей
@@ -64,7 +64,7 @@
         - Статусы в БД хранятся lowercase-строками (`varchar(20) default 'ready'`), значения только
           `ready`/`issued`/`cancelled`; контроллер передаёт литералы — приведение регистра не требуется.
     - **deps:** []
-    - **acceptance:** (1) `./gradlew test` из `pvz/` зелёный (unit + `@WebMvcTest` проходят; Testcontainers-классы
+    - **acceptance:** (1) `./gradlew test` из `../../pvz` зелёный (unit + `@WebMvcTest` проходят; Testcontainers-классы
       проходят при Docker либо пропущены — в отчёте указано, что запускалось); (2) файлы `src/test` не изменялись и не
       создавались; (3) в `OrderRepository` есть `findByStatus`, SQL переиспользует `ORDER_COLUMNS` и заканчивается
       `where status = :status order by created_at desc, id desc`; (4) в `OrderServiceImpl` заглушка заменена: пустая/
@@ -74,8 +74,8 @@
       `listByStatus` в `OrderServiceImpl` на ветвление «пустая/blank → `findAll()`, иначе → `findByStatus(status.trim())»`;
       дополнить javadoc на `OrderService.listByStatus`; прогнать существующую сюиту тестов, ничего в ней не меняя.
     - **touched:**
-        - `pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java` — добавлен `findByStatus(@Bind("status"))`
+        - `../../pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java` — добавлен `findByStatus(@Bind("status"))`
           (после `findBySearchTerm`, ORDER_COLUMNS + `where status = :status order by created_at desc, id desc`)
-        - `pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java` — заглушка `listByStatus` заменена
+        - `../../pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java` — заглушка `listByStatus` заменена
           ветвлением (null/blank → `findAll()`, иначе → `findByStatus(status.trim())`), без `@Transactional`
-        - `pvz/src/main/java/io/allitov/pvz/service/OrderService.java` — javadoc на `listByStatus` дополнен контрактом
+        - `../../pvz/src/main/java/io/allitov/pvz/service/OrderService.java` — javadoc на `listByStatus` дополнен контрактом

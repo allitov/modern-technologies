@@ -3,7 +3,7 @@
 - **Дата:** 2026-10-23
 - **Ревьюер:** GLM-5.3-Flash (субагент-ревьюер, только чтение)
 - **Объект:** незакоммиченные изменения рабочего дерева относительно `HEAD` (Task1 предварительно застейджен, Task2 — рабочее дерево); дифф снят командой `git diff HEAD -- pvz/` после `git add` трёх файлов Task2.
-- **Контракт:** спека оркестратора + план `opencode-plans/lab-5-impl-list-orders.md` (Task2).
+- **Контракт:** спека оркестратора + план `../../opencode-plans/lab-5/lab-5-impl-list-orders.md` (Task2).
 - **Примечание оркестратора:** субагент-ревьюер не смог записать файл (пермишены сессии); отчёт дословно сохранён оркестратором.
 
 **Вердикт: PASS**
@@ -12,10 +12,10 @@
 Незакоммиченные изменения рабочего дерева относительно `HEAD` (Task1 предварительно застейджен, Task2 — рабочее дерево). Дифф снят командой `git diff HEAD -- pvz/` после `git add` трёх файлов Task2.
 
 ## 1. Скоуп диффа — PASS
-- `pvz/src/main/java/io/allitov/pvz/model/OrderFilter.java` — новый файл (26 строк).
-- `pvz/src/main/java/io/allitov/pvz/service/OrderService.java` — только javadoc + перегрузка + импорт (`OrderService.java:5,18-46`).
-- `pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java` — только импорт и замена заглушки `listOrders` (`OrderServiceImpl.java:4,48-59`).
-- `pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java` — дифф идентичен Task1 и был застейджен до начала Task2 (статус `M ` в worktree без модификаций); Task2 его не менял.
+- `../../pvz/src/main/java/io/allitov/pvz/model/OrderFilter.java` — новый файл (26 строк).
+- `../../pvz/src/main/java/io/allitov/pvz/service/OrderService.java` — только javadoc + перегрузка + импорт (`OrderService.java:5,18-46`).
+- `../../pvz/src/main/java/io/allitov/pvz/service/impl/OrderServiceImpl.java` — только импорт и замена заглушки `listOrders` (`OrderServiceImpl.java:4,48-59`).
+- `../../pvz/src/main/java/io/allitov/pvz/repository/OrderRepository.java` — дифф идентичен Task1 и был застейджен до начала Task2 (статус `M ` в worktree без модификаций); Task2 его не менял.
 - Отсутствуют изменения: `web/OrderController.java`, `model/Order.java`, `src/test/**` (подтверждено `git status --porcelain` и `git diff HEAD --stat`). Стабы `issueOrder`/`cancelOrder`/`buildReport`/`listByStatus` не тронуты (`OrderServiceImpl.java:33-46,61-64`).
 
 ## 2. `OrderFilter` — PASS
@@ -46,7 +46,7 @@
 
 ## Замечания по инфраструктуре ревью
 - Компиляция `.\gradlew compileJava` не выполнена (пермишены окружения); корректность Lombok-связки подтверждена статически. Регрессию прогнал тестер отдельно: 14 тестов GREEN (`--rerun`).
-- Изменения вне `pvz` (`opencode-plans/lab-5-impl-list-orders.md`, `tasks/lab-5-impl-list-orders.md`, отчёт Task1) — артефакты рабочего процесса, код не затрагивают.
+- Изменения вне `pvz` (`../../opencode-plans/lab-5/lab-5-impl-list-orders.md`, `../tasks/lab-5/lab-5-impl-list-orders.md`, отчёт Task1) — артефакты рабочего процесса, код не затрагивают.
 
 ---
 

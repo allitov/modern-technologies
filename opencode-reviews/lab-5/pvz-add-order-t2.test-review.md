@@ -30,7 +30,7 @@
 
 ### 4. Конвенции проекта
 
-- JUnit 5 + AssertJ; `@Nested` на каждый метод продакшна (`AddOrder`/`Add`) — по `.opencode/rules/test-rules.md`.
+- JUnit 5 + AssertJ; `@Nested` на каждый метод продакшна (`AddOrder`/`Add`) — по `../../.opencode/rules/test-rules.md`.
 - `@DisplayName` на русском у каждого теста, включая `contextLoads`.
 - Параметризация: классификация ×4 (`@MethodSource`), источники исключения ×2 (`@ValueSource`); провайдер данных после использующего теста.
 - `@MockitoBean` (`OrderControllerTest.java:27`, `org.springframework.test.context.bean.override.mockito`) — не `@MockBean`; требование Boot 4 выполнено.
