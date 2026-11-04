@@ -3,6 +3,9 @@ lombok = "9.5.0"
 junitBom = "6.0.0"
 log4j = "2.26.1"
 assertJ = "3.27.7"
+springBoot = "4.1.1"
+springDependencyManagement = "1.1.7"
+jdbi = "3.52.1"
 
 [libraries]
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junitBom" }
@@ -10,6 +13,25 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertJ" }
 log4j-slf4j = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.ref = "log4j" }
+spring-boot-starter-flyway = { module = "org.springframework.boot:spring-boot-starter-flyway" }
+spring-boot-starter-thymeleaf = { module = "org.springframework.boot:spring-boot-starter-thymeleaf" }
+spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+spring-boot-starter-data-jdbc = { module = "org.springframework.boot:spring-boot-starter-data-jdbc" }
+spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
+spring-boot-starter-flyway-test = { module = "org.springframework.boot:spring-boot-starter-flyway-test" }
+spring-boot-starter-thymeleaf-test = { module = "org.springframework.boot:spring-boot-starter-thymeleaf-test" }
+spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
+flyway-database-postgresql = { module = "org.flywaydb:flyway-database-postgresql" }
+postgresql = { module = "org.postgresql:postgresql" }
+lombok = { module = "org.projectlombok:lombok" }
+testcontainers-junit-jupiter = { module = "org.testcontainers:testcontainers-junit-jupiter" }
+testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql" }
+jdbi3-core = { module = "org.jdbi:jdbi3-core", version.ref = "jdbi" }
+jdbi3-sqlobject = { module = "org.jdbi:jdbi3-sqlobject", version.ref = "jdbi" }
+jdbi3-postgres = { module = "org.jdbi:jdbi3-postgres", version.ref = "jdbi" }
+jdbi3-spring5 = { module = "org.jdbi:jdbi3-spring5", version.ref = "jdbi" }
 
 [plugins]
 lombok = { id = "io.freefair.lombok", version.ref = "lombok" }
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }

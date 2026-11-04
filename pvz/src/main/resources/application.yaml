@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: pvz
+  datasource:
+    url: ${PICKUP_DB_URL:jdbc:postgresql://localhost:5432/pvz}
+    username: ${PICKUP_DB_USER:user}
+    password: ${PICKUP_DB_PASSWORD:password}
+  flyway:
+    locations: classpath:db/migration
+    enabled: true

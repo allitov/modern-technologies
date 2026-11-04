@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Приёмка заказа</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<h1>Приёмка заказа</h1>
+
+<div class="status-bar" th:if="${msg != null}" th:classappend="${msg != null ? 'msg-' + msgType : ''}">
+    <span th:text="${msg}">Сообщение</span>
+</div>
+
+<form class="form-card" method="post" action="/orders">
+    <label for="contact">Телефон или артикул:</label>
+    <input type="text" id="contact" name="contact" th:value="${contact}">
+    <p class="hint">Например: +79990001122  или  ART-123456789</p>
+    <p class="error" th:if="${contactError != null}" th:text="${contactError}">Ошибка</p>
+
+    <label for="cell">Ячейка хранения:</label>
+    <input type="text" id="cell" name="cell" th:value="${cell}">
+    <p class="hint">Например: A1, B12, полка-3</p>
+    <p class="error" th:if="${cellError != null}" th:text="${cellError}">Ошибка</p>
+
+    <div class="toolbar">
+        <button type="submit" class="button-primary">Принять</button>
+        <a class="button" href="/">Отмена</a>
+    </div>
+</form>
+</body>
+</html>

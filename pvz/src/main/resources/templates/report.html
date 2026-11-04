@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Отчёт по заказам</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<h1>Отчёт по заказам</h1>
+
+<p class="summary">
+    Принято: <span th:text="${report.readyCount}">0</span> •
+    Выдано: <span th:text="${report.issuedCount}">0</span> •
+    Отменено: <span th:text="${report.cancelledCount}">0</span>
+</p>
+
+<section class="report-section">
+    <h2>Принято</h2>
+    <table class="orders">
+        <thead>
+        <tr>
+            <th>Код</th>
+            <th>Телефон</th>
+            <th>Артикул</th>
+            <th>Ячейка</th>
+            <th>Статус</th>
+            <th>Поступил</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${#lists.isEmpty(readyOrders)}">
+            <td colspan="6" class="empty">Заказов нет</td>
+        </tr>
+        <th:block th:each="order : ${readyOrders}">
+            <tr th:replace="~{orders :: order-row(${order})}"></tr>
+        </th:block>
+        </tbody>
+    </table>
+</section>
+
+<section class="report-section">
+    <h2>Выдано</h2>
+    <table class="orders">
+        <thead>
+        <tr>
+            <th>Код</th>
+            <th>Телефон</th>
+            <th>Артикул</th>
+            <th>Ячейка</th>
+            <th>Статус</th>
+            <th>Поступил</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${#lists.isEmpty(issuedOrders)}">
+            <td colspan="6" class="empty">Заказов нет</td>
+        </tr>
+        <th:block th:each="order : ${issuedOrders}">
+            <tr th:replace="~{orders :: order-row(${order})}"></tr>
+        </th:block>
+        </tbody>
+    </table>
+</section>
+
+<section class="report-section">
+    <h2>Отменено</h2>
+    <table class="orders">
+        <thead>
+        <tr>
+            <th>Код</th>
+            <th>Телефон</th>
+            <th>Артикул</th>
+            <th>Ячейка</th>
+            <th>Статус</th>
+            <th>Поступил</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${#lists.isEmpty(cancelledOrders)}">
+            <td colspan="6" class="empty">Заказов нет</td>
+        </tr>
+        <th:block th:each="order : ${cancelledOrders}">
+            <tr th:replace="~{orders :: order-row(${order})}"></tr>
+        </th:block>
+        </tbody>
+    </table>
+</section>
+
+<div class="toolbar">
+    <a class="button" href="/">Назад</a>
+</div>
+</body>
+</html>
