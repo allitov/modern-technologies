@@ -22,26 +22,14 @@ jobs:
       - name: Get source code
         uses: actions/checkout@v5
 
-      - name: Cache Gradle dependencies and wrapper
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', 'gradle/libs.versions.toml', 'gradle/wrapper/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-
       - name: Set up build environment (JDK 25)
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '25'
 
-      - name: Set up Gradle (wrapper validation)
+      - name: Set up Gradle (cache and wrapper validation)
         uses: gradle/actions/setup-gradle@v5
-        with:
-          cache-disabled: true
 
       - name: Install dependencies
         run: bash ./gradlew :data-converter:dependencies --configuration runtimeClasspath
