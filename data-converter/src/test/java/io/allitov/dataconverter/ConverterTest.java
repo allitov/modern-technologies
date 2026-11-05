@@ -95,7 +95,7 @@ class ConverterTest {
         ConversionException ex = assertThrows(ConversionException.class,
                 () -> Converter.convertFile(input, output));
 
-        assertEquals("File has no extension " + input, ex.getMessage());
+        assertEquals("File has no extension: " + input, ex.getMessage());
     }
 
     @Test
