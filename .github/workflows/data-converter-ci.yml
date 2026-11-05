@@ -22,8 +22,12 @@ on:
 
 jobs:
   build-and-test:
-    name: Build and test data-converter
-    runs-on: ubuntu-latest
+    name: Build and test data-converter (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Get source code
         uses: actions/checkout@v4
@@ -50,6 +54,6 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: data-converter-test-reports
+          name: data-converter-test-reports-${{ matrix.os }}
           path: data-converter/build/reports/tests/test
           retention-days: 7
