@@ -4,20 +4,10 @@ on:
   push:
     paths:
       - 'data-converter/**'
-      - 'build.gradle.kts'
-      - 'settings.gradle.kts'
-      - 'gradle/**'
-      - 'gradlew'
-      - 'gradlew.bat'
       - '.github/workflows/data-converter-ci.yml'
   pull_request:
     paths:
       - 'data-converter/**'
-      - 'build.gradle.kts'
-      - 'settings.gradle.kts'
-      - 'gradle/**'
-      - 'gradlew'
-      - 'gradlew.bat'
       - '.github/workflows/data-converter-ci.yml'
 
 jobs:
