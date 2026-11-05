@@ -1,0 +1,55 @@
+name: Data Converter CI
+
+on:
+  push:
+    paths:
+      - 'data-converter/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'gradle/**'
+      - 'gradlew'
+      - 'gradlew.bat'
+      - '.github/workflows/data-converter-ci.yml'
+  pull_request:
+    paths:
+      - 'data-converter/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'gradle/**'
+      - 'gradlew'
+      - 'gradlew.bat'
+      - '.github/workflows/data-converter-ci.yml'
+
+jobs:
+  build-and-test:
+    name: Build and test data-converter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get source code
+        uses: actions/checkout@v4
+
+      - name: Set up build environment (JDK 25)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+
+      - name: Set up Gradle (cache and wrapper validation)
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install dependencies
+        run: ./gradlew :data-converter:dependencies --configuration runtimeClasspath
+
+      - name: Build application
+        run: ./gradlew :data-converter:assemble
+
+      - name: Run tests
+        run: ./gradlew :data-converter:test
+
+      - name: Upload test reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-converter-test-reports
+          path: data-converter/build/reports/tests/test
+          retention-days: 7
