@@ -38,13 +38,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Install dependencies
-        run: ./gradlew :data-converter:dependencies --configuration runtimeClasspath
+        run: bash ./gradlew :data-converter:dependencies --configuration runtimeClasspath
 
       - name: Build application
-        run: ./gradlew :data-converter:assemble
+        run: bash ./gradlew :data-converter:assemble
 
       - name: Run tests
-        run: ./gradlew :data-converter:test
+        run: bash ./gradlew :data-converter:test
 
       - name: Upload test reports on failure
         if: failure()
