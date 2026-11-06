@@ -44,10 +44,6 @@ public class CadrService {
         employeeRepository.save(e);
     }
 
-    /**
-     * Перевод {@code Service::setEmployeeActive} — в C++-версии метод объявлен
-     * в {@code service.h}, но реализации в {@code service.cpp} не имеет.
-     */
     public void setEmployeeActive(long id, boolean active) {
         throw new UnsupportedOperationException("Service.setEmployeeActive not implemented");
     }
@@ -117,24 +113,16 @@ public class CadrService {
         assignmentRepository.save(assignment);
     }
 
-    /**
-     * ЗАДАЧА: возврат техники со съёмки обратно в стойку.
-     *
-     * <p>Перевод {@code Service::giveBack} — в C++-версии реализации нет.
-     * Вызывается из главного окна кнопкой «Принять».</p>
-     *
-     * <p>Контракт:</p>
-     * <ul>
-     *   <li>Вход: assetId — id техники.</li>
-     *   <li>Успех: у активной выдачи проставляется returnedAt = текущее время,
-     *       у техники assigned = false. Ничего не возвращается (void).</li>
-     *   <li>Ошибка — выбросить {@link DomainError}: если активной выдачи нет
-     *       (техника уже в стойке): «Нет активной выдачи для этой техники».</li>
-     *   <li>При ошибке изменения в БД не применяются.</li>
-     * </ul>
-     */
+    @Transactional
     public void giveBack(long assetId) {
-        throw new UnsupportedOperationException("Service.giveBack not implemented");
+        Assignment assignment = assignmentRepository.findByAssetIdAndReturnedAtIsNull(assetId)
+                .orElseThrow(() -> new DomainError("Нет активной выдачи для этой техники"));
+        assignment.setReturnedAt(Instant.now().getEpochSecond());
+        assignmentRepository.save(assignment);
+
+        Asset asset = assignment.getAsset();
+        asset.setAssigned(false);
+        assetRepository.save(asset);
     }
 
     @Transactional(readOnly = true)

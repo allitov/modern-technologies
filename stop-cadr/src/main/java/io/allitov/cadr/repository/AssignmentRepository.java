@@ -4,6 +4,7 @@ import io.allitov.cadr.domain.Assignment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Доступ к таблице {@code assignments}.
@@ -21,4 +22,10 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
      * текущий держатель каждой единицы техники.
      */
     List<Assignment> findByReturnedAtIsNull();
+
+    /**
+     * Активная выдача конкретной единицы техники: выдача по {@code asset_id},
+     * у которой ещё нет даты возврата.
+     */
+    Optional<Assignment> findByAssetIdAndReturnedAtIsNull(Long assetId);
 }
