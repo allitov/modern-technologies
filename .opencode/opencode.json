@@ -41,6 +41,7 @@
     { "action": "shell", "resource": "git restore -- .", "effect": "deny" },
     { "action": "shell", "resource": "git restore --staged .", "effect": "deny" },
     { "action": "shell", "resource": "./gradlew *", "effect": "allow" },
+    { "action": "shell", "resource": "./gradlew.bat *", "effect": "allow" },
     { "action": "shell", "resource": "rm -rf*", "effect": "deny" },
     { "action": "shell", "resource": "rm -fr*", "effect": "deny" },
 
