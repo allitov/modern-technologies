@@ -17,7 +17,7 @@
     { "action": "glob", "resource": "*", "effect": "allow" },
     { "action": "grep", "resource": "*", "effect": "allow" },
 
-    { "action": "edit", "resource": "*", "effect": "ask" },
+    { "action": "edit", "resource": "*", "effect": "allow" },
     { "action": "edit", "resource": "*.git/*", "effect": "deny" },
     { "action": "edit", "resource": "*.gitignore", "effect": "deny" },
     { "action": "edit", "resource": "*.gitattributes", "effect": "deny" },
