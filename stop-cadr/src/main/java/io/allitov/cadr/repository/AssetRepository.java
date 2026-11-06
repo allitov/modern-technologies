@@ -11,4 +11,6 @@ import java.util.List;
 public interface AssetRepository extends JpaRepository<Asset, Long> {
 
     List<Asset> findByAssignedFalse();
+
+    boolean existsByInventoryNumber(String inventoryNumber);
 }

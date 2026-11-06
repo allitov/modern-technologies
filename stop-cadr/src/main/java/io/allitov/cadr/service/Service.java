@@ -109,24 +109,17 @@ public class Service {
         throw new UnsupportedOperationException("Service.assets not implemented");
     }
 
-    /**
-     * ЗАДАЧА: добавление единицы техники в каталог.
-     *
-     * <p>Перевод {@code Service::addAsset} — в C++-версии реализации нет.
-     * Вызывается из диалога «+ Техника» после клика «Сохранить».</p>
-     *
-     * <p>Контракт:</p>
-     * <ul>
-     *   <li>Вход: inv — инвентарный номер, model, category — текстовые поля.</li>
-     *   <li>Успех: в БД появляется одна запись в assets со статусом
-     *       assigned = false. Ничего не возвращается (void).</li>
-     *   <li>Ошибка — выбросить {@link DomainError}: если такой inventoryNumber уже
-     *       есть, текст: «Инвентарный номер &lt;inv&gt; уже существует».</li>
-     *   <li>При ошибке изменения в БД не применяются.</li>
-     * </ul>
-     */
+    @Transactional
     public void addAsset(String inv, String model, String category) {
-        throw new UnsupportedOperationException("Service.addAsset not implemented");
+        if (assetRepository.existsByInventoryNumber(inv)) {
+            throw new DomainError("Инвентарный номер " + inv + " уже существует");
+        }
+        Asset a = new Asset();
+        a.setInventoryNumber(inv);
+        a.setModel(model);
+        a.setCategory(category);
+        a.setAssigned(false);
+        assetRepository.save(a);
     }
 
     // ==================== Выдача ====================
