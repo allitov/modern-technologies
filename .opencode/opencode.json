@@ -4,10 +4,6 @@
   "snapshot": true,
   "model": "ZAI/glm-5.3-flash#max",
   "default_agent": "Planner",
-  "agent": {
-    "build": { "disable": true },
-    "plan": { "disable": true }
-  },
   "permissions": [
     { "action": "read", "resource": "*", "effect": "allow" },
     { "action": "read", "resource": "*.env", "effect": "deny" },
