@@ -1,0 +1,290 @@
+:root {
+    --bg:            #F5F6FA;
+    --surface:       #FFFFFF;
+    --header-bg:     #1E293B;
+    --accent:        #3B82F6;
+    --accent-hover:  #2563EB;
+    --success:       #10B981;
+    --success-bg:    #D1FAE5;
+    --warning:       #F59E0B;
+    --danger:        #EF4444;
+    --danger-bg:     #FEE2E2;
+    --info-bg:       #DBEAFE;
+    --text-primary:  #1F2937;
+    --text-muted:    #6B7280;
+    --border:        #E5E7EB;
+    --row-alt:       #FAFBFD;
+    --row-hover:     #F0F5FF;
+    --row-selected:  #DBEAFE;
+    --tab-inactive:  #37475F;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    color: var(--text-primary);
+    font: 13px/1.45 "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ---------- Шапка и статусная строка главного окна ---------- */
+
+.app-header {
+    flex-shrink: 0;
+    height: 72px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    background: var(--header-bg);
+}
+
+.brand {
+    color: #FFFFFF;
+    font-size: 20px;
+    font-weight: 700;
+    margin-right: 16px;
+}
+
+.tab {
+    display: inline-block;
+    width: 160px;
+    padding: 9px 0;
+    border-radius: 4px;
+    text-align: center;
+    background: var(--tab-inactive);
+    color: #FFFFFF;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.tab:hover { background: var(--accent-hover); }
+.tab.active { background: var(--accent); }
+
+.app-status {
+    flex-shrink: 0;
+    margin-top: auto;
+    padding: 8px 24px;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+/* ---------- Содержимое вкладки ---------- */
+
+.content {
+    flex: 1;
+    padding: 24px;
+}
+
+.content.narrow {
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.toolbar .spacer { flex: 1; }
+
+.search-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 16px;
+}
+
+.search-form label {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* ---------- Поля ввода ---------- */
+
+input[type="text"],
+input[type="email"],
+select {
+    height: 40px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--surface);
+    color: var(--text-primary);
+    font: inherit;
+}
+
+input:focus,
+select:focus {
+    outline: 2px solid var(--row-selected);
+}
+
+/* ---------- Кнопки (Theme::primary / Theme::secondary) ---------- */
+
+.btn {
+    height: 40px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn.primary {
+    background: var(--accent);
+    color: #FFFFFF;
+    font-weight: 700;
+}
+
+.btn.primary:hover { background: var(--accent-hover); }
+
+.btn.secondary {
+    background: var(--surface);
+    color: var(--text-primary);
+}
+
+.btn.secondary:hover { background: var(--row-selected); }
+
+/* ---------- Сообщения об ошибках (аналог fl_alert) ---------- */
+
+.alert {
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+
+.alert.error {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+/* ---------- Таблица (DataTable) ---------- */
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.data-table th {
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--border);
+    text-align: left;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.data-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+.data-table tbody tr:nth-child(even) { background: var(--row-alt); }
+.data-table tbody tr:hover { background: var(--row-hover); }
+.data-table tbody tr.selected { background: var(--row-selected); }
+
+.data-table td.empty {
+    color: var(--text-muted);
+    text-align: center;
+}
+
+/* ---------- Бейджи статусов (DataTable::setBadgeColumn) ---------- */
+
+.badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.badge.success { background: var(--success-bg); color: var(--success); }
+.badge.accent  { background: var(--info-bg);    color: var(--accent); }
+.badge.muted   { background: var(--bg);         color: var(--text-muted); }
+
+/* ---------- Диалоги (EmployeeDialog, AssetDialog, IssueDialog) ---------- */
+
+.modal {
+    width: 440px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+}
+
+.modal::backdrop { background: rgba(30, 41, 59, 0.45); }
+
+/* Диалог, встроенный в страницу (редактирование фотографа) */
+.modal.static { margin: 0; }
+
+.modal-header {
+    height: 56px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.modal-content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.modal-content input,
+.modal-content select {
+    width: 100%;
+}
+
+.modal-content label.field {
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    margin-top: 8px;
+}
+
+.modal-content label.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.modal-content label.checkbox input { width: auto; }
+
+.modal-footer {
+    height: 60px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+}

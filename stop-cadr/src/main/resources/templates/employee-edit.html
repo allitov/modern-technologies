@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<!-- Диалог «Редактирование фотографа» — перевод EmployeeDialog в режиме правки -->
+<head th:replace="~{fragments/layout :: head('Редактирование фотографа')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('employees')}"></header>
+
+<main class="content narrow">
+    <div class="alert error" role="alert" th:if="${error}" th:text="${error}"></div>
+
+    <form class="modal static" th:action="@{/employees/update}" method="post">
+        <input type="hidden" name="id" th:value="${employee.id}">
+        <div class="modal-header">Редактирование фотографа</div>
+        <div class="modal-content">
+            <label class="field" for="edit-name">ФИО</label>
+            <input type="text" id="edit-name" name="fullName" th:value="${employee.fullName}">
+            <label class="field" for="edit-email">Email</label>
+            <input type="text" id="edit-email" name="email" th:value="${employee.email}">
+            <label class="checkbox">
+                <input type="checkbox" name="active" th:checked="${employee.active}">
+                В штате (снятие уволит фотографа)
+            </label>
+        </div>
+        <div class="modal-footer">
+            <a class="btn secondary" th:href="@{/employees}">Отмена</a>
+            <button type="submit" class="btn primary">Сохранить</button>
+        </div>
+    </form>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
