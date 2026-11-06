@@ -21,6 +21,7 @@ dependencies {
     implementation(libs.spring.boot.starter.webmvc)
     implementation(libs.flyway.database.postgresql)
     implementation(libs.spring.boot.starter.data.jpa)
+    runtimeOnly(libs.postgresql)
     testImplementation(libs.testcontainers.junit.jupiter)
     testImplementation(libs.spring.boot.testcontainers)
     testImplementation(libs.testcontainers.postgresql)
