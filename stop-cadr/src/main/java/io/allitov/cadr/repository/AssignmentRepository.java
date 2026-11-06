@@ -1,6 +1,7 @@
 package io.allitov.cadr.repository;
 
 import io.allitov.cadr.domain.Assignment;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
      * Все активные выдачи (дата возврата не проставлена) — по ним определяется
      * текущий держатель каждой единицы техники.
      */
+    @EntityGraph(attributePaths = {"asset", "employee"})
     List<Assignment> findByReturnedAtIsNull();
 
     /**
