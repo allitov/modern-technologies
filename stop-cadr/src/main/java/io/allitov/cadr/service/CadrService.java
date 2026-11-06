@@ -1,6 +1,7 @@
 package io.allitov.cadr.service;
 
 import io.allitov.cadr.domain.Asset;
+import io.allitov.cadr.domain.Assignment;
 import io.allitov.cadr.domain.DomainError;
 import io.allitov.cadr.domain.Employee;
 import io.allitov.cadr.repository.AssetRepository;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -92,31 +94,27 @@ public class CadrService {
         assetRepository.save(a);
     }
 
-    // ==================== Выдача ====================
-
-    /**
-     * ЗАДАЧА (главная в лабе): оформление выдачи техники фотографу.
-     *
-     * <p>Перевод {@code Service::issue} — в C++-версии реализации нет.
-     * Вызывается из диалога «Выдать» после клика «Сохранить».</p>
-     *
-     * <p>Контракт:</p>
-     * <ul>
-     *   <li>Вход: assetId, employeeId — id существующих записей.</li>
-     *   <li>Успех: техника переходит в статус assigned = true,
-     *       в assignments появляется запись с issuedAt = текущее время
-     *       и пустым returnedAt. Ничего не возвращается (void).</li>
-     *   <li>Ошибки — выбросить {@link DomainError}:
-     *       1) техника уже на съёмке: «Техника уже выдана»;
-     *       2) фотограф уволен: «Нельзя выдать уволенному фотографу».</li>
-     *   <li>При любой ошибке изменения в БД не применяются.</li>
-     *   <li>Если прервать процесс между обновлением техники и созданием записи
-     *       о выдаче (например, временно сломать БД) — статус техники
-     *       не должен остаться «на съёмке» (нужна одна транзакция).</li>
-     * </ul>
-     */
+    @Transactional
     public void issue(long assetId, long employeeId) {
-        throw new UnsupportedOperationException("Service.issue not implemented");
+        Asset asset = assetRepository.findById(assetId)
+                .orElseThrow(() -> new DomainError("Техника не найдена"));
+        if (asset.isAssigned()) {
+            throw new DomainError("Техника уже выдана");
+        }
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new DomainError("Фотограф не найден"));
+        if (!employee.isActive()) {
+            throw new DomainError("Нельзя выдать уволенному фотографу");
+        }
+        asset.setAssigned(true);
+        assetRepository.save(asset);
+
+        Assignment assignment = new Assignment();
+        assignment.setAsset(asset);
+        assignment.setEmployee(employee);
+        assignment.setIssuedAt(Instant.now().getEpochSecond());
+        assignment.setReturnedAt(null);
+        assignmentRepository.save(assignment);
     }
 
     /**
