@@ -98,6 +98,7 @@ public class CadrController {
             service.updateEmployee(id, fullName, email, active);
         } catch (RuntimeException e) {
             ra.addFlashAttribute("error", "Ошибка: " + e.getMessage());
+            return "redirect:/employees/edit?id=" + id;
         }
         return "redirect:/employees";
     }

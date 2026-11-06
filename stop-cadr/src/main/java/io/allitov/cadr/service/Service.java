@@ -63,29 +63,20 @@ public class Service {
         throw new UnsupportedOperationException("Service.setEmployeeActive not implemented");
     }
 
-    /**
-     * ЗАДАЧА: обновление данных фотографа.
-     *
-     * <p>Перевод {@code Service::updateEmployee} — в C++-версии реализации нет.
-     * Вызывается из диалога редактирования после клика «Сохранить».
-     * Меняет ФИО, email и статус «в штате»/«уволен».</p>
-     *
-     * <p>Контракт:</p>
-     * <ul>
-     *   <li>Вход: id — существующий фотограф; name, email — новые значения;
-     *       active — {@code true} (в штате) или {@code false} (уволен).</li>
-     *   <li>Успех: поля в БД обновлены, ничего не возвращается (void).</li>
-     *   <li>Ошибки — выбросить {@link DomainError}:
-     *       1) если email изменился и такой email уже есть у другого фотографа,
-     *          текст: «Фотограф с email &lt;email&gt; уже существует»;
-     *       2) если active становится {@code false}, а за фотографом есть техника
-     *          на съёмке, текст: «У фотографа на руках техника — сначала
-     *          примите возврат».</li>
-     *   <li>При любой из ошибок изменения в БД не применяются.</li>
-     * </ul>
-     */
+    @Transactional
     public void updateEmployee(long id, String name, String email, boolean active) {
-        throw new UnsupportedOperationException("Service.updateEmployee not implemented");
+        Employee e = employeeRepository.findById(id)
+                .orElseThrow(() -> new DomainError("Фотограф не найден"));
+        if (!e.getEmail().equals(email) && employeeRepository.existsByEmailAndIdNot(email, id)) {
+            throw new DomainError("Фотограф с email " + email + " уже существует");
+        }
+        if (!active && assignmentRepository.existsByEmployeeIdAndReturnedAtIsNull(id)) {
+            throw new DomainError("У фотографа на руках техника — сначала примите возврат");
+        }
+        e.setFullName(name);
+        e.setEmail(email);
+        e.setActive(active);
+        employeeRepository.save(e);
     }
 
     // ==================== Техника ====================
