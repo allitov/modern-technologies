@@ -7,42 +7,29 @@ import io.allitov.cadr.repository.AssetRepository;
 import io.allitov.cadr.repository.AssignmentRepository;
 import io.allitov.cadr.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Сервис учёта техники студии.
- *
- * <p>Перевод класса {@code Service} из {@code include/service.h}, {@code src/service.cpp}
- * (ODB заменён на spring-data-jpa). Методы, оставленные без реализации в C++-версии,
- * оставлены без реализации и здесь.</p>
- *
- * <p>Аннотация стереотипа указана полностью квалифицированным именем, потому что
- * короткий импорт {@code org.springframework.stereotype.Service} конфликтовал бы
- * с именем класса.</p>
  */
-@org.springframework.stereotype.Service
+@Service
 @RequiredArgsConstructor
-public class Service {
+public class CadrService {
 
     private final EmployeeRepository employeeRepository;
     private final AssetRepository assetRepository;
     private final AssignmentRepository assignmentRepository;
 
-    // ==================== Фотографы ====================
-
-    /**
-     * ГОТОВО (образец): список всех фотографов.
-     */
     @Transactional(readOnly = true)
     public List<Employee> employees() {
         return employeeRepository.findAll();
     }
 
-    /**
-     * ГОТОВО (образец): добавление фотографа с проверкой уникальности email.
-     */
     @Transactional
     public void addEmployee(String name, String email) {
         if (employeeRepository.existsByEmail(email)) {
@@ -79,25 +66,17 @@ public class Service {
         employeeRepository.save(e);
     }
 
-    // ==================== Техника ====================
-
-    /**
-     * ЗАДАЧА: список всей техники с указанием текущего держателя.
-     *
-     * <p>Перевод {@code Service::assets} — в C++-версии реализации нет.
-     * Вызывается при каждой перерисовке вкладки «Техника».</p>
-     *
-     * <p>Контракт:</p>
-     * <ul>
-     *   <li>Вход: нет.</li>
-     *   <li>Успех: возвращает {@code List<AssetRow>}, по одному элементу
-     *       на каждую единицу техники в БД. В поле holder — ФИО фотографа,
-     *       если техника сейчас на съёмке, или пустая строка, если в стойке.</li>
-     *   <li>Ошибок не бросает (пустая БД — пустой список).</li>
-     * </ul>
-     */
+    @Transactional(readOnly = true)
     public List<AssetRow> assets() {
-        throw new UnsupportedOperationException("Service.assets not implemented");
+        Map<Long, String> holders = assignmentRepository.findByReturnedAtIsNull().stream()
+                .collect(Collectors.toMap(
+                        a -> a.getAsset().getId(),
+                        a -> a.getEmployee().getFullName(),
+                        (first, _) -> first));
+
+        return assetRepository.findAll().stream()
+                .map(asset -> new AssetRow(asset, holders.getOrDefault(asset.getId(), "")))
+                .toList();
     }
 
     @Transactional
@@ -160,19 +139,11 @@ public class Service {
         throw new UnsupportedOperationException("Service.giveBack not implemented");
     }
 
-    // ==================== Для диалогов ====================
-
-    /**
-     * ГОТОВО (образец): список активных фотографов для выпадающего списка.
-     */
     @Transactional(readOnly = true)
     public List<Employee> activeEmployees() {
         return employeeRepository.findByActiveTrue();
     }
 
-    /**
-     * ГОТОВО (образец): список свободной техники для выпадающего списка.
-     */
     @Transactional(readOnly = true)
     public List<Asset> freeAssets() {
         return assetRepository.findByAssignedFalse();

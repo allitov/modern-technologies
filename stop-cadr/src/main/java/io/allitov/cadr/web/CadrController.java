@@ -2,7 +2,7 @@ package io.allitov.cadr.web;
 
 import io.allitov.cadr.domain.Employee;
 import io.allitov.cadr.service.AssetRow;
-import io.allitov.cadr.service.Service;
+import io.allitov.cadr.service.CadrService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CadrController {
 
-    private final Service service;
+    private final CadrService cadrService;
 
     @GetMapping("/")
     public String index() {
@@ -32,7 +32,7 @@ public class CadrController {
     ) {
         List<Employee> employees = new ArrayList<>();
         try {
-            employees = service.employees().stream()
+            employees = cadrService.employees().stream()
                     .filter(e -> matches(e, search))
                     .toList();
         } catch (RuntimeException e) {
@@ -58,7 +58,7 @@ public class CadrController {
             return "redirect:/employees";
         }
         try {
-            service.addEmployee(fullName, email);
+            cadrService.addEmployee(fullName, email);
         } catch (RuntimeException e) {
             ra.addFlashAttribute("error", "Ошибка: " + e.getMessage());
         }
@@ -67,7 +67,7 @@ public class CadrController {
 
     @GetMapping("/employees/edit")
     public String editEmployee(@RequestParam long id, Model model) {
-        Employee employee = service.employees().stream()
+        Employee employee = cadrService.employees().stream()
                 .filter(e -> e.getId() == id)
                 .findFirst()
                 .orElse(null);
@@ -95,7 +95,7 @@ public class CadrController {
             return "redirect:/employees/edit?id=" + id;
         }
         try {
-            service.updateEmployee(id, fullName, email, active);
+            cadrService.updateEmployee(id, fullName, email, active);
         } catch (RuntimeException e) {
             ra.addFlashAttribute("error", "Ошибка: " + e.getMessage());
             return "redirect:/employees/edit?id=" + id;
@@ -110,7 +110,7 @@ public class CadrController {
     ) {
         List<AssetRow> rows = new ArrayList<>();
         try {
-            rows = service.assets().stream()
+            rows = cadrService.assets().stream()
                     .filter(r -> matches(r, filter))
                     .toList();
         } catch (RuntimeException e) {
@@ -119,8 +119,8 @@ public class CadrController {
         model.addAttribute("rows", rows);
         model.addAttribute("filter", filter);
         model.addAttribute("filters", List.of("Все", "В стойке", "На съёмке"));
-        model.addAttribute("activeEmployees", service.activeEmployees());
-        model.addAttribute("freeAssets", service.freeAssets());
+        model.addAttribute("activeEmployees", cadrService.activeEmployees());
+        model.addAttribute("freeAssets", cadrService.freeAssets());
         return "assets";
     }
 
@@ -140,7 +140,7 @@ public class CadrController {
             return "redirect:/assets";
         }
         try {
-            service.addAsset(inventoryNumber, model, category);
+            cadrService.addAsset(inventoryNumber, model, category);
         } catch (RuntimeException e) {
             ra.addFlashAttribute("error", "Ошибка: " + e.getMessage());
         }
@@ -154,7 +154,7 @@ public class CadrController {
             RedirectAttributes ra
     ) {
         try {
-            service.issue(assetId, employeeId);
+            cadrService.issue(assetId, employeeId);
         } catch (RuntimeException e) {
             ra.addFlashAttribute("error", "Ошибка: " + e.getMessage());
         }
@@ -164,7 +164,7 @@ public class CadrController {
     @PostMapping("/assets/return")
     public String giveBack(@RequestParam long assetId, RedirectAttributes ra) {
         try {
-            service.giveBack(assetId);
+            cadrService.giveBack(assetId);
         } catch (RuntimeException e) {
             ra.addFlashAttribute("error", "Ошибка: " + e.getMessage());
         }
