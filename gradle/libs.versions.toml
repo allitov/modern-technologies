@@ -30,6 +30,7 @@ jdbi3-core = { module = "org.jdbi:jdbi3-core", version.ref = "jdbi" }
 jdbi3-sqlobject = { module = "org.jdbi:jdbi3-sqlobject", version.ref = "jdbi" }
 jdbi3-postgres = { module = "org.jdbi:jdbi3-postgres", version.ref = "jdbi" }
 jdbi3-spring5 = { module = "org.jdbi:jdbi3-spring5", version.ref = "jdbi" }
+spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
 
 [plugins]
 lombok = { id = "io.freefair.lombok", version.ref = "lombok" }
