@@ -271,15 +271,36 @@ public class CadrService {
                 .toList();
     }
 
-    // ------------------------------------------------------------
-    // Передать выданную технику другому фотографу.
-    // Ошибки: "Техника не выдана — используйте «Выдать»",
-    //         "Нельзя переназначить уволенному фотографу",
-    //         "Нет активной выдачи",
-    //         "Техника уже у этого фотографа".
-    // ------------------------------------------------------------
+    @Transactional
     public void reassignAsset(long assetId, long newEmployeeId) {
-        throw new UnsupportedOperationException("Service.reassignAsset not implemented");
+        Assignment active = assignmentRepository.findByAssetIdAndReturnedAtIsNull(assetId)
+                .orElseThrow(() -> new DomainError("Нет активной выдачи"));
+
+        Asset asset = active.getAsset();
+        if (!asset.isAssigned()) {
+            throw new DomainError("Техника не выдана — используйте «Выдать»");
+        }
+        Employee currentEmployee = active.getEmployee();
+        if (currentEmployee.getId() == newEmployeeId) {
+            throw new DomainError("Техника уже у этого фотографа");
+        }
+
+        Employee newEmployee = employeeRepository.findById(newEmployeeId)
+                .orElseThrow(() -> new DomainError("Фотограф не найден"));
+        if (!newEmployee.isActive()) {
+            throw new DomainError("Нельзя переназначить уволенному фотографу");
+        }
+
+        long now = Instant.now().getEpochSecond();
+        active.setReturnedAt(now);
+        assignmentRepository.saveAndFlush(active);
+
+        Assignment assignment = new Assignment();
+        assignment.setAsset(asset);
+        assignment.setEmployee(newEmployee);
+        assignment.setIssuedAt(now);
+        assignment.setReturnedAt(null);
+        assignmentRepository.save(assignment);
     }
 
     // ------------------------------------------------------------

@@ -14,7 +14,7 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
 
     /**
      * Есть ли у фотографа техника на съёмке: выдача по {@code employee_id},
-     * у которой ещё нет даты возврата (аналог ODB-запроса с {@code returnedAt_.is_null()}).
+     * у которой ещё нет даты возврата.
      */
     boolean existsByEmployeeIdAndReturnedAtIsNull(Long employeeId);
 
@@ -27,9 +27,9 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
 
     /**
      * Активная выдача конкретной единицы техники: выдача по {@code asset_id},
-     * у которой ещё нет даты возврата. Загружает фотографа для определения держателя.
+     * у которой ещё нет даты возврата.
      */
-    @EntityGraph(attributePaths = {"employee"})
+    @EntityGraph(attributePaths = {"asset", "employee"})
     Optional<Assignment> findByAssetIdAndReturnedAtIsNull(Long assetId);
 
     /**
