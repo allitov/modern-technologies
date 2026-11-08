@@ -154,15 +154,36 @@ public class CadrService {
         assetRepository.save(copy);
     }
 
-    // ------------------------------------------------------------
-    // Выдать N единиц одному фотографу одной транзакцией.
-    // Ошибки: "Не выбрано ни одной единицы техники",
-    //         "Нельзя выдать уволенному фотографу",
-    //         "Техника <inv> уже выдана".
-    // При ошибке — ни одна не выдана.
-    // ------------------------------------------------------------
+    @Transactional
     public void issueMultiple(List<Long> assetIds, long employeeId) {
-        throw new UnsupportedOperationException("Service.issueMultiple not implemented");
+        if (assetIds == null || assetIds.isEmpty()) {
+            throw new DomainError("Не выбрано ни одной единицы техники");
+        }
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new DomainError("Фотограф не найден"));
+        if (!employee.isActive()) {
+            throw new DomainError("Нельзя выдать уволенному фотографу");
+        }
+
+        List<Asset> assets = assetRepository.findAllById(assetIds);
+        for (Asset asset : assets) {
+            if (asset.isAssigned()) {
+                throw new DomainError("Техника " + asset.getInventoryNumber() + " уже выдана");
+            }
+        }
+
+        long issuedAt = Instant.now().getEpochSecond();
+        for (Asset asset : assets) {
+            asset.setAssigned(true);
+            assetRepository.save(asset);
+
+            Assignment assignment = new Assignment();
+            assignment.setAsset(asset);
+            assignment.setEmployee(employee);
+            assignment.setIssuedAt(issuedAt);
+            assignment.setReturnedAt(null);
+            assignmentRepository.save(assignment);
+        }
     }
 
     /**
