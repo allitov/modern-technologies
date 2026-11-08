@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<!-- Вкладка «Фотографы» — перевод EmployeesTab -->
+<head th:replace="~{fragments/layout :: head('Стоп-кадр — Фотографы')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('employees')}"></header>
+
+<main class="content">
+    <div class="toolbar">
+        <!-- Поиск: обновление на каждый ввод — аналог FL_WHEN_CHANGED -->
+        <form class="search-form" th:action="@{/employees}" method="get">
+            <label for="search">Поиск:</label>
+            <input type="text" id="search" name="search" th:value="${search}"
+                   placeholder="ФИО или email" oninput="this.form.submit()">
+        </form>
+        <span class="spacer"></span>
+        <button type="button" class="btn primary" onclick="openDialog('add-dialog')">+ Фотограф</button>
+        <button type="button" class="btn secondary" onclick="editSelected()">Изменить</button>
+    </div>
+
+    <!-- Сообщения об ошибках — аналог fl_alert -->
+    <div class="alert error" role="alert" th:if="${error}" th:text="${error}"></div>
+
+    <!-- Таблица DataTable: ID, ФИО, Email, Статус (бейдж) -->
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>ФИО</th>
+            <th>Email</th>
+            <th>Статус</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="e : ${employees}" th:attr="data-id=${e.id}">
+            <td th:text="${e.id}"></td>
+            <td th:text="${e.fullName}"></td>
+            <td th:text="${e.email}"></td>
+            <td>
+                <span th:class="${e.active} ? 'badge success' : 'badge muted'"
+                      th:text="${e.active} ? 'В штате' : 'Уволен'"></span>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(employees)}">
+            <td colspan="4" class="empty">Нет фотографов</td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+
+<!-- Диалог «Новый фотограф» — перевод EmployeeDialog в режиме добавления -->
+<dialog id="add-dialog" class="modal">
+    <form th:action="@{/employees/add}" method="post">
+        <div class="modal-header">Новый фотограф</div>
+        <div class="modal-content">
+            <label class="field" for="add-name">ФИО</label>
+            <input type="text" id="add-name" name="fullName">
+            <label class="field" for="add-email">Email</label>
+            <input type="text" id="add-email" name="email">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn secondary" onclick="closeDialog('add-dialog')">Отмена</button>
+            <button type="submit" class="btn primary">Сохранить</button>
+        </div>
+    </form>
+</dialog>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<script>
+    // Перевод выбора строки DataTable: клик — выбор, двойной клик — редактирование.
+    let selectedId = null;
+    document.querySelectorAll('tr[data-id]').forEach(tr => {
+        tr.addEventListener('click', () => {
+            document.querySelectorAll('tr.selected').forEach(r => r.classList.remove('selected'));
+            tr.classList.add('selected');
+            selectedId = tr.dataset.id;
+        });
+        tr.addEventListener('dblclick', () => {
+            window.location.href = '/employees/edit?id=' + tr.dataset.id;
+        });
+    });
+
+    // Перевод EmployeesTab::editCb: без выбранной строки — fl_alert «Выберите строку».
+    function editSelected() {
+        if (selectedId === null) { alert('Выберите строку'); return; }
+        window.location.href = '/employees/edit?id=' + selectedId;
+    }
+
+    function openDialog(id) { document.getElementById(id).showModal(); }
+    function closeDialog(id) { document.getElementById(id).close(); }
+</script>
+</body>
+</html>

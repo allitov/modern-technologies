@@ -1,0 +1,12 @@
+name: stop-cadr-env
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: cadr-postgres
+    environment:
+      POSTGRES_DB: cadr
+      POSTGRES_USER: cadr
+      POSTGRES_PASSWORD: cadr
+    ports:
+      - "5432:5432"

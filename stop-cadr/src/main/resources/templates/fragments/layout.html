@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<!--
+  Общая раскладка главного окна (перевод MainWindow):
+  шапка с брендом и кнопками-вкладками, статусная строка.
+-->
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <title th:text="${title}">Стоп-кадр</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body>
+
+<!-- Шапка: бренд «Стоп-кадр» и кнопки-вкладки -->
+<header class="app-header" th:fragment="header(active)">
+    <span class="brand">Стоп-кадр</span>
+    <nav>
+        <a class="tab" th:href="@{/employees}"
+           th:classappend="${active == 'employees'} ? 'active'">Фотографы</a>
+        <a class="tab" th:href="@{/assets}"
+           th:classappend="${active == 'assets'} ? 'active'">Техника</a>
+    </nav>
+</header>
+
+<!-- Статусная строка главного окна -->
+<footer class="app-status" th:fragment="footer">
+    Готово&nbsp;&nbsp;·&nbsp;&nbsp;PostgreSQL
+</footer>
+
+</body>
+</html>
