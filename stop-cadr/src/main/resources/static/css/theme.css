@@ -288,3 +288,105 @@ select:focus {
     background: var(--surface);
     border-top: 1px solid var(--border);
 }
+
+/* ---------- Перевод Theme::dangerBtn (вторичная кнопка с красным текстом) ---------- */
+
+.btn.danger { color: var(--danger); }
+
+/* ---------- Неактивные элементы (перевод deactivate()) ---------- */
+
+.btn.disabled,
+.btn:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: default;
+}
+
+/* ---------- Пагинация (перевод pageLabel_ и соседних кнопок) ---------- */
+
+.toolbar.right { justify-content: flex-end; }
+
+.page-label {
+    min-width: 80px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+/* ---------- Диалог «Массовая выдача» (BulkIssueDialog, 560px) ---------- */
+
+.modal.wide { width: 560px; }
+
+select.multi { height: 260px; }
+
+.bulk-counter {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+/* ---------- Диалог «Смена фотографа» (ReassignDialog) ---------- */
+
+.dialog-title {
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 700;
+    margin-top: 8px;
+}
+
+.static-box {
+    padding: 8px 12px;
+    border-radius: 4px;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+/* ---------- Страницы «Поиск техники» и «История выдач» (SearchDialog, HistoryDialog) ---------- */
+
+.page-header {
+    border-radius: 6px;
+    margin-bottom: 16px;
+}
+
+.page-title {
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.search-panel {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.search-panel .filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.search-panel .filter-field.grow { flex: 1; }
+
+.search-panel label.field {
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.search-panel input[type="checkbox"] {
+    width: auto;
+    height: auto;
+    margin: 12px 0;
+}
+
+.hint {
+    padding: 10px 14px;
+    border-radius: 4px;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 14px;
+}

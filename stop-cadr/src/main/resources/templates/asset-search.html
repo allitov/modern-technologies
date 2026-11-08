@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<!-- Диалог «Поиск техники» — перевод SearchDialog -->
+<head th:replace="~{fragments/layout :: head('Стоп-кадр — Поиск техники')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('assets')}"></header>
+
+<main class="content">
+    <div class="modal-header page-header">Поиск техники</div>
+
+    <!-- Перевод SearchDialog: категория | только свободные | модель или инв. номер | «Найти» -->
+    <form class="search-panel" th:action="@{/assets/search}" method="get">
+        <input type="hidden" name="searched" value="true">
+        <div class="filter-field">
+            <label class="field" for="search-category">Категория</label>
+            <select id="search-category" name="category">
+                <option th:each="c : ${categories}" th:value="${c}" th:text="${c}"
+                        th:selected="${c == category}"></option>
+            </select>
+        </div>
+        <div class="filter-field">
+            <label class="field" for="search-only-free">Только свободные</label>
+            <input type="checkbox" id="search-only-free" name="onlyFree" th:checked="${onlyFree}">
+        </div>
+        <div class="filter-field grow">
+            <label class="field" for="search-text">Модель или инв. номер</label>
+            <input type="text" id="search-text" name="text" th:value="${text}">
+        </div>
+        <button type="submit" class="btn primary">Найти</button>
+    </form>
+
+    <div class="alert error" role="alert" th:if="${error}" th:text="${error}"></div>
+
+    <!-- Подсказка — перевод hint_:
+         до первого поиска и когда ничего не найдено таблица скрыта. -->
+    <div class="hint" th:if="${!searched}">Заполните фильтры и нажмите «Найти»</div>
+    <div class="hint" th:if="${searched and #lists.isEmpty(results)}">Ничего не найдено</div>
+
+    <!-- Результаты — перевод DataTable с бейджем статуса в колонке 4 -->
+    <table class="data-table" th:if="${searched and !#lists.isEmpty(results)}">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Инв.№</th>
+            <th>Модель</th>
+            <th>Категория</th>
+            <th>Статус</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="a : ${results}">
+            <td th:text="${a.id}"></td>
+            <td th:text="${a.inventoryNumber}"></td>
+            <td th:text="${a.model}"></td>
+            <td th:text="${a.category}"></td>
+            <td>
+                <span th:class="${a.assigned} ? 'badge accent' : 'badge success'"
+                      th:text="${a.assigned} ? 'На съёмке' : 'В стойке'"></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="toolbar">
+        <a class="btn secondary" th:href="@{/assets}">Закрыть</a>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

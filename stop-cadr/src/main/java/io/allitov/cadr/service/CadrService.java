@@ -8,10 +8,14 @@ import io.allitov.cadr.repository.AssetRepository;
 import io.allitov.cadr.repository.AssignmentRepository;
 import io.allitov.cadr.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -133,5 +137,133 @@ public class CadrService {
     @Transactional(readOnly = true)
     public List<Asset> freeAssets() {
         return assetRepository.findByAssignedFalse();
+    }
+
+    // ---------- Лаба 8 (в service_lab8.cpp) ----------
+    // Лабораторная 8: 8 методов через JPA.
+    // Готово: searchAssets, listAssetsPaged, assetHistory, employeeAssets.
+    // Реализуйте: duplicateAsset, issueMultiple, reassignAsset, deleteAssetCascade.
+
+    // ------------------------------------------------------------
+    // Копирование техники. newInv должен быть уникален.
+    // Ошибка: "Инвентарный номер <newInv> уже существует".
+    // ------------------------------------------------------------
+    public void duplicateAsset(long sourceId, String newInv) {
+        throw new UnsupportedOperationException("Service.duplicateAsset not implemented");
+    }
+
+    // ------------------------------------------------------------
+    // Выдать N единиц одному фотографу одной транзакцией.
+    // Ошибки: "Не выбрано ни одной единицы техники",
+    //         "Нельзя выдать уволенному фотографу",
+    //         "Техника <inv> уже выдана".
+    // При ошибке — ни одна не выдана.
+    // ------------------------------------------------------------
+    public void issueMultiple(List<Long> assetIds, long employeeId) {
+        throw new UnsupportedOperationException("Service.issueMultiple not implemented");
+    }
+
+    /**
+     * Поиск техники по категории, признаку «только свободные» и подстроке
+     * модели или инвентарного номера.
+     */
+    @Transactional(readOnly = true)
+    public List<Asset> searchAssets(String category, boolean onlyFree, String text) {
+        Specification<Asset> spec = (_, _, cb) -> cb.conjunction();
+
+        if (category != null && !category.isEmpty()) {
+            spec = spec.and((root, _, cb) -> cb.equal(root.get("category"), category));
+        }
+
+        if (onlyFree) {
+            spec = spec.and((root, _, cb) -> cb.isFalse(root.get("assigned")));
+        }
+
+        if (text != null && !text.isEmpty()) {
+            String pattern = "%" + text + "%";
+            spec = spec.and((root, _, cb) -> cb.or(
+                    cb.like(root.get("model"), pattern),
+                    cb.like(root.get("inventoryNumber"), pattern)));
+        }
+
+        return assetRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "id"));
+    }
+
+    /**
+     * Страница списка техники с текущим держателем каждой единицы
+     * и признаком следующей страницы.
+     */
+    @Transactional(readOnly = true)
+    public PagedAssets listAssetsPaged(int page, int pageSize, String statusFilter) {
+        Specification<Asset> spec = (root, query, cb) -> cb.conjunction();
+
+        if ("В стойке".equals(statusFilter)) {
+            spec = spec.and((root, query, cb) -> cb.isFalse(root.get("assigned")));
+        } else if ("На съёмке".equals(statusFilter)) {
+            spec = spec.and((root, query, cb) -> cb.isTrue(root.get("assigned")));
+        }
+
+        List<Asset> all = assetRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "id"));
+
+        int offset = page * pageSize;
+        int end = Math.min(offset + pageSize, all.size());
+
+        List<AssetRow> items = new ArrayList<>();
+        for (int i = offset; i < end; i++) {
+            Asset asset = all.get(i);
+            String holder = "";
+            if (asset.isAssigned()) {
+                holder = assignmentRepository.findByAssetIdAndReturnedAtIsNull(asset.getId())
+                        .map(asg -> asg.getEmployee().getFullName())
+                        .orElse("");
+            }
+            items.add(new AssetRow(asset, holder));
+        }
+
+        return new PagedAssets(items, offset + pageSize < all.size());
+    }
+
+    /**
+     * История выдач единицы техники с ФИО каждого держателя,
+     * отсортированная по дате выдачи по убыванию.
+     */
+    @Transactional(readOnly = true)
+    public List<HistoryEntry> assetHistory(long assetId) {
+        return assignmentRepository.findByAssetId(assetId).stream()
+                .map(asg -> new HistoryEntry(asg, asg.getEmployee().getFullName()))
+                .sorted(Comparator.comparingLong(
+                        (HistoryEntry e) -> e.assignment().getIssuedAt()).reversed())
+                .toList();
+    }
+
+    /**
+     * Техника, находящаяся сейчас у фотографа (активные выдачи),
+     * отсортированная по {@code id} по убыванию.
+     */
+    @Transactional(readOnly = true)
+    public List<Asset> employeeAssets(long employeeId) {
+        return assignmentRepository.findByEmployeeIdAndReturnedAtIsNull(employeeId).stream()
+                .map(asg -> assetRepository.findById(asg.getAsset().getId()).orElseThrow())
+                .sorted(Comparator.comparingLong(Asset::getId).reversed())
+                .toList();
+    }
+
+    // ------------------------------------------------------------
+    // Передать выданную технику другому фотографу.
+    // Ошибки: "Техника не выдана — используйте «Выдать»",
+    //         "Нельзя переназначить уволенному фотографу",
+    //         "Нет активной выдачи",
+    //         "Техника уже у этого фотографа".
+    // ------------------------------------------------------------
+    public void reassignAsset(long assetId, long newEmployeeId) {
+        throw new UnsupportedOperationException("Service.reassignAsset not implemented");
+    }
+
+    // ------------------------------------------------------------
+    // Удалить технику и все её выдачи. Только если не выдана.
+    // Ошибка: "Нельзя удалить выданную технику — сначала примите возврат".
+    // ------------------------------------------------------------
+    public void deleteAssetCascade(long assetId) {
+        throw new UnsupportedOperationException("Service.deleteAssetCascade not implemented");
     }
 }

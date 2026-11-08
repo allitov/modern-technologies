@@ -27,7 +27,21 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
 
     /**
      * Активная выдача конкретной единицы техники: выдача по {@code asset_id},
-     * у которой ещё нет даты возврата.
+     * у которой ещё нет даты возврата. Загружает фотографа для определения держателя.
      */
+    @EntityGraph(attributePaths = {"employee"})
     Optional<Assignment> findByAssetIdAndReturnedAtIsNull(Long assetId);
+
+    /**
+     * Все выдачи единицы техники — история выдач ({@code assetHistory}).
+     */
+    @EntityGraph(attributePaths = {"employee"})
+    List<Assignment> findByAssetId(Long assetId);
+
+    /**
+     * Активные выдачи фотографа — техника, которая сейчас у него на руках
+     * ({@code employeeAssets}).
+     */
+    @EntityGraph(attributePaths = {"asset"})
+    List<Assignment> findByEmployeeIdAndReturnedAtIsNull(Long employeeId);
 }
