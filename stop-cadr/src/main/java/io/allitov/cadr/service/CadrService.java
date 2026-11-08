@@ -303,11 +303,14 @@ public class CadrService {
         assignmentRepository.save(assignment);
     }
 
-    // ------------------------------------------------------------
-    // Удалить технику и все её выдачи. Только если не выдана.
-    // Ошибка: "Нельзя удалить выданную технику — сначала примите возврат".
-    // ------------------------------------------------------------
+    @Transactional
     public void deleteAssetCascade(long assetId) {
-        throw new UnsupportedOperationException("Service.deleteAssetCascade not implemented");
+        Asset asset = assetRepository.findById(assetId)
+                .orElseThrow(() -> new DomainError("Техника не найдена"));
+        if (asset.isAssigned()) {
+            throw new DomainError("Нельзя удалить выданную технику — сначала примите возврат");
+        }
+        assignmentRepository.deleteByAssetId(assetId);
+        assetRepository.delete(asset);
     }
 }

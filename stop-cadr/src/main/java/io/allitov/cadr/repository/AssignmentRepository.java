@@ -44,4 +44,10 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
      */
     @EntityGraph(attributePaths = {"asset"})
     List<Assignment> findByEmployeeIdAndReturnedAtIsNull(Long employeeId);
+
+    /**
+     * Удалить все выдачи единицы техники — каскад при списании
+     * ({@code deleteAssetCascade}).
+     */
+    void deleteByAssetId(Long assetId);
 }
