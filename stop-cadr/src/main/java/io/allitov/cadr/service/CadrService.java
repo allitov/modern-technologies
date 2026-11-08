@@ -139,17 +139,19 @@ public class CadrService {
         return assetRepository.findByAssignedFalse();
     }
 
-    // ---------- Лаба 8 (в service_lab8.cpp) ----------
-    // Лабораторная 8: 8 методов через JPA.
-    // Готово: searchAssets, listAssetsPaged, assetHistory, employeeAssets.
-    // Реализуйте: duplicateAsset, issueMultiple, reassignAsset, deleteAssetCascade.
-
-    // ------------------------------------------------------------
-    // Копирование техники. newInv должен быть уникален.
-    // Ошибка: "Инвентарный номер <newInv> уже существует".
-    // ------------------------------------------------------------
+    @Transactional
     public void duplicateAsset(long sourceId, String newInv) {
-        throw new UnsupportedOperationException("Service.duplicateAsset not implemented");
+        Asset source = assetRepository.findById(sourceId)
+                .orElseThrow(() -> new DomainError("Техника не найдена"));
+        if (assetRepository.existsByInventoryNumber(newInv)) {
+            throw new DomainError("Инвентарный номер " + newInv + " уже существует");
+        }
+        Asset copy = new Asset();
+        copy.setInventoryNumber(newInv);
+        copy.setModel(source.getModel());
+        copy.setCategory(source.getCategory());
+        copy.setAssigned(false);
+        assetRepository.save(copy);
     }
 
     // ------------------------------------------------------------
