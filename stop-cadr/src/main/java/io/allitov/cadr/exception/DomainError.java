@@ -1,4 +1,4 @@
-package io.allitov.cadr.domain;
+package io.allitov.cadr.exception;
 
 /**
  * Доменная ошибка — нарушение бизнес-правила учёта техники.

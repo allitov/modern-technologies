@@ -6,19 +6,42 @@
 <header th:replace="~{fragments/layout :: header('assets')}"></header>
 
 <main class="content">
+    <!-- Row 1: filter | search | history | ◀ Стр. N ▶ — перевод AssetsTab::layout -->
     <div class="toolbar">
-        <!-- Фильтр: Все / В стойке / На съёмке — перевод Fl_Choice -->
+        <!-- Фильтр: Все / В стойке / На съёмке — перевод Fl_Choice + filterCb (страница сбрасывается) -->
         <form th:action="@{/assets}" method="get">
             <select name="filter" onchange="this.form.submit()">
                 <option th:each="f : ${filters}" th:value="${f}" th:text="${f}"
                         th:selected="${f == filter}"></option>
             </select>
         </form>
-        <button type="button" class="btn primary" onclick="issueSelected()">Выдать</button>
-        <button type="button" class="btn secondary" onclick="returnSelected()">Принять</button>
-        <span class="spacer"></span>
+        <!-- Поиск и история — перевод searchBtn_ / historyBtn_ -->
+        <a class="btn secondary" th:href="@{/assets/search}">Поиск</a>
+        <button type="button" class="btn secondary" onclick="historySelected()">История</button>
+        <!-- Пагинация — перевод prevPageBtn_ / pageLabel_ / nextPageBtn_ -->
+        <a class="btn secondary" th:if="${page > 0}"
+           th:href="@{/assets(filter=${filter},page=${page - 1})}">◀</a>
+        <span class="btn secondary disabled" th:unless="${page > 0}">◀</span>
+        <span class="page-label" th:text="|Стр. ${page + 1}|">Стр. 1</span>
+        <a class="btn secondary" th:if="${hasNext}"
+           th:href="@{/assets(filter=${filter},page=${page + 1})}">▶</a>
+        <span class="btn secondary disabled" th:unless="${hasNext}">▶</span>
+    </div>
+
+    <!-- Row 2: CRUD (выравнивание вправо) -->
+    <div class="toolbar right">
         <button type="button" class="btn primary" onclick="openDialog('add-asset-dialog')">+ Техника</button>
         <button type="button" class="btn secondary" onclick="editSelected()">Изменить</button>
+        <button type="button" class="btn secondary" onclick="copySelected()">Копировать</button>
+        <button type="button" class="btn danger" onclick="deleteSelected()">Удалить</button>
+    </div>
+
+    <!-- Row 3: операции -->
+    <div class="toolbar">
+        <button type="button" class="btn primary" id="issue-btn" onclick="issueSelected()">Выдать</button>
+        <button type="button" class="btn secondary" onclick="bulkIssueSelected()">Выдать несколько</button>
+        <button type="button" class="btn secondary" id="reassign-btn" onclick="reassignSelected()">Сменить</button>
+        <button type="button" class="btn secondary" id="return-btn" onclick="returnSelected()">Принять</button>
     </div>
 
     <div class="alert error" role="alert" th:if="${error}" th:text="${error}"></div>
@@ -36,7 +59,9 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="r : ${rows}" th:attr="data-id=${r.asset.id}">
+        <tr th:each="r : ${rows}"
+            th:attr="data-id=${r.asset.id}, data-inv=${r.asset.inventoryNumber}, data-model=${r.asset.model},
+                     data-cat=${r.asset.category}, data-assigned=${r.asset.assigned}, data-holder=${r.holder}">
             <td th:text="${r.asset.id}"></td>
             <td th:text="${r.asset.inventoryNumber}"></td>
             <td th:text="${r.asset.model}"></td>
@@ -48,7 +73,7 @@
             <td th:text="${#strings.isEmpty(r.holder)} ? '—' : ${r.holder}"></td>
         </tr>
         <tr th:if="${#lists.isEmpty(rows)}">
-            <td colspan="6" class="empty">Нет техники</td>
+            <td colspan="6" class="empty">Здесь пока пусто — нажмите «+ Техника»</td>
         </tr>
         </tbody>
     </table>
@@ -80,6 +105,62 @@
     </form>
 </dialog>
 
+<!-- Диалог «Редактирование техники» — перевод AssetDialog в режиме правки:
+     AssetsTab::doEdit открывает его с пустым обработчиком сохранения, поэтому
+     «Сохранить» просто закрывает диалог (форма без действия). -->
+<dialog id="edit-asset-dialog" class="modal">
+    <form onsubmit="closeDialog('edit-asset-dialog'); return false;">
+        <div class="modal-header">Редактирование техники</div>
+        <div class="modal-content">
+            <label class="field" for="edit-inv">Инвентарный номер</label>
+            <input type="text" id="edit-inv">
+            <label class="field" for="edit-model">Модель</label>
+            <input type="text" id="edit-model">
+            <label class="field" for="edit-cat">Категория</label>
+            <select id="edit-cat">
+                <option>Камера</option>
+                <option>Объектив</option>
+                <option>Вспышка</option>
+                <option>Штатив</option>
+                <option>Свет</option>
+                <option>Другое</option>
+            </select>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn secondary" onclick="closeDialog('edit-asset-dialog')">Отмена</button>
+            <button type="submit" class="btn primary">Сохранить</button>
+        </div>
+    </form>
+</dialog>
+
+<!-- Диалог «Копирование техники» — перевод AssetDialog с readOnlyDetails:
+     модель и категория показываются, но недоступны; вводится только инв. номер. -->
+<dialog id="copy-asset-dialog" class="modal">
+    <form th:action="@{/assets/copy}" method="post" onsubmit="return validateCopy()">
+        <input type="hidden" name="assetId" id="copy-asset-id">
+        <div class="modal-header">Копирование техники</div>
+        <div class="modal-content">
+            <label class="field" for="copy-inv">Инвентарный номер</label>
+            <input type="text" id="copy-inv" name="inventoryNumber">
+            <label class="field" for="copy-model">Модель</label>
+            <input type="text" id="copy-model" disabled>
+            <label class="field" for="copy-cat">Категория</label>
+            <select id="copy-cat" disabled>
+                <option>Камера</option>
+                <option>Объектив</option>
+                <option>Вспышка</option>
+                <option>Штатив</option>
+                <option>Свет</option>
+                <option>Другое</option>
+            </select>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn secondary" onclick="closeDialog('copy-asset-dialog')">Отмена</button>
+            <button type="submit" class="btn primary">Сохранить</button>
+        </div>
+    </form>
+</dialog>
+
 <!-- Диалог выдачи техники — перевод IssueDialog -->
 <dialog id="issue-dialog" class="modal">
     <form th:action="@{/assets/issue}" method="post" onsubmit="return validateIssue()">
@@ -103,62 +184,215 @@
     </form>
 </dialog>
 
-<!-- Скрытая форма возврата для кнопки «Принять» тулбара -->
+<!-- Диалог «Массовая выдача» — перевод BulkIssueDialog:
+     фотограф + список свободной техники с множественным выбором и счётчиком. -->
+<dialog id="bulk-issue-dialog" class="modal wide">
+    <form th:action="@{/assets/bulk-issue}" method="post" onsubmit="return validateBulkIssue()">
+        <div class="modal-header">Массовая выдача техники</div>
+        <div class="modal-content">
+            <label class="field" for="bulk-employee">Фотограф</label>
+            <select id="bulk-employee" name="employeeId">
+                <option th:each="e : ${activeEmployees}" th:value="${e.id}"
+                        th:text="${e.fullName}"></option>
+            </select>
+            <label class="field" for="bulk-assets">Техника (Ctrl+Click — выбрать несколько)</label>
+            <select id="bulk-assets" name="assetIds" class="multi" multiple onchange="updateBulkCounter()">
+                <option th:each="a : ${freeAssets}" th:value="${a.id}"
+                        th:text="${a.inventoryNumber + ' — ' + a.model + ' (' + a.category + ')'}"></option>
+            </select>
+            <span class="bulk-counter" id="bulk-counter">Выбрано: 0 из 0</span>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn secondary" onclick="closeDialog('bulk-issue-dialog')">Отмена</button>
+            <button type="submit" class="btn primary">Выдать</button>
+        </div>
+    </form>
+</dialog>
+
+<!-- Диалог «Смена фотографа» — перевод ReassignDialog -->
+<dialog id="reassign-asset-dialog" class="modal">
+    <form th:action="@{/assets/reassign}" method="post" onsubmit="return validateReassign()">
+        <input type="hidden" name="assetId" id="reassign-asset-id">
+        <div class="modal-header">Смена фотографа</div>
+        <div class="modal-content">
+            <span id="reassign-label" class="dialog-title"></span>
+            <label class="field" for="reassign-holder-static">Сейчас у фотографа</label>
+            <span id="reassign-holder-static" class="static-box"></span>
+            <label class="field" for="reassign-employee">Передать фотографу</label>
+            <select id="reassign-employee" name="employeeId">
+                <option th:each="e : ${activeEmployees}" th:value="${e.id}"
+                        th:text="${e.fullName}"></option>
+            </select>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn secondary" onclick="closeDialog('reassign-asset-dialog')">Отмена</button>
+            <button type="submit" class="btn primary">Передать</button>
+        </div>
+    </form>
+</dialog>
+
+<!-- Скрытые формы для кнопок тулбара (перевод doReturn / doDelete) -->
 <form id="return-form" th:action="@{/assets/return}" method="post">
+    <input type="hidden" name="assetId">
+</form>
+<form id="delete-form" th:action="@{/assets/delete}" method="post">
     <input type="hidden" name="assetId">
 </form>
 
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 
 <script>
-    // Перевод выбора строки DataTable: клик — выбор.
+    // Перевод выбора строки DataTable: клик — выбор и updateButtons.
     let selectedId = null;
     document.querySelectorAll('tr[data-id]').forEach(tr => {
         tr.addEventListener('click', () => {
             document.querySelectorAll('tr.selected').forEach(r => r.classList.remove('selected'));
             tr.classList.add('selected');
             selectedId = tr.dataset.id;
+            updateButtons();
         });
     });
 
-    // Перевод AssetsTab::issueCb / returnCb / editCb: без выбранной строки — fl_alert.
-    function requireSelection() {
-        if (selectedId === null) { alert('Выберите технику'); return false; }
+    // Перевод AssetsTab::issueCb / returnCb / editCb / copyCb / deleteCb /
+    // historyCb / reassignCb: без выбранной строки — fl_alert.
+    function requireSelection(message) {
+        if (selectedId === null) { alert(message); return false; }
         return true;
     }
+
+    function selectedRow() {
+        return document.querySelector('tr.selected');
+    }
+
+    // Перевод AssetsTab::updateButtons: активность «Выдать», «Принять» и «Сменить»
+    // зависит от статуса выбранной техники.
+    function updateButtons() {
+        const tr = selectedRow();
+        const assigned = tr ? tr.dataset.assigned === 'true' : null;
+        document.getElementById('issue-btn').disabled = assigned === null || assigned;
+        document.getElementById('return-btn').disabled = assigned === null || !assigned;
+        document.getElementById('reassign-btn').disabled = assigned === null || !assigned;
+    }
+    updateButtons();
 
     // Перевод AssetsTab::doIssue: диалог заполняется списками активных
     // фотографов и свободной техники, выбранная строка не используется.
     function issueSelected() {
-        if (!requireSelection()) return;
+        if (!requireSelection('Выберите технику')) return;
         openDialog('issue-dialog');
     }
 
     // Перевод AssetsTab::doReturn: подтверждение fl_choice перед возвратом.
     function returnSelected() {
-        if (!requireSelection()) return;
+        if (!requireSelection('Выберите технику')) return;
         if (!confirm('Принять технику обратно в стойку?')) return;
         document.querySelector('#return-form input[name="assetId"]').value = selectedId;
         document.getElementById('return-form').submit();
     }
 
-    // В C++-версии диалог редактирования техники (AssetsTab::doEdit) открывается
-    // с пустым обработчиком сохранения, поэтому отдельной страницы нет.
+    // Перевод AssetsTab::doEdit: диалог с данными строки, сохранение — пустая операция.
     function editSelected() {
-        if (!requireSelection()) return;
+        if (!requireSelection('Выберите строку')) return;
+        const tr = selectedRow();
+        document.getElementById('edit-inv').value = tr.dataset.inv;
+        document.getElementById('edit-model').value = tr.dataset.model;
+        document.getElementById('edit-cat').value = tr.dataset.cat;
+        openDialog('edit-asset-dialog');
     }
 
-    // Перевод IssueDialog::okCb.
-    function validateIssue() {
-        if (document.getElementById('issue-employee').options.length === 0) {
-            alert('Нет фотографов в штате');
-            return false;
-        }
-        if (document.getElementById('issue-asset').options.length === 0) {
-            alert('Вся техника занята');
+    // Перевод AssetsTab::doCopy: диалог копирования с недоступными моделью и категорией.
+    function copySelected() {
+        if (!requireSelection('Выберите строку')) return;
+        const tr = selectedRow();
+        document.getElementById('copy-asset-id').value = selectedId;
+        document.getElementById('copy-inv').value = '';
+        document.getElementById('copy-model').value = tr.dataset.model;
+        document.getElementById('copy-cat').value = tr.dataset.cat;
+        openDialog('copy-asset-dialog');
+    }
+
+    // Перевод AssetDialog::okCb: инв. номер обязателен.
+    function validateCopy() {
+        if (!document.getElementById('copy-inv').value) {
+            alert('Введите инв. номер');
             return false;
         }
         return true;
+    }
+
+    // Перевод AssetsTab::doDelete: подтверждение fl_choice перед удалением.
+    function deleteSelected() {
+        if (!requireSelection('Выберите строку')) return;
+        if (!confirm('Удалить технику и всю историю её выдач?')) return;
+        document.querySelector('#delete-form input[name="assetId"]').value = selectedId;
+        document.getElementById('delete-form').submit();
+    }
+
+    // Перевод AssetsTab::doBulkIssue + BulkIssueDialog::okCb / listCb.
+    function bulkIssueSelected() {
+        if (document.getElementById('bulk-employee').options.length === 0) {
+            alert('Нет фотографов в штате');
+            return;
+        }
+        openDialog('bulk-issue-dialog');
+        updateBulkCounter();
+    }
+
+    function updateBulkCounter() {
+        const list = document.getElementById('bulk-assets');
+        const selected = [...list.options].filter(o => o.selected).length;
+        document.getElementById('bulk-counter').textContent =
+            'Выбрано: ' + selected + ' из ' + list.options.length;
+    }
+
+    function validateBulkIssue() {
+        if (document.getElementById('bulk-employee').options.length === 0) {
+            alert('Нет фотографов в штате');
+            return false;
+        }
+        const selected = [...document.getElementById('bulk-assets').options]
+            .filter(o => o.selected);
+        if (selected.length === 0) {
+            alert('Выберите хотя бы одну единицу техники');
+            return false;
+        }
+        return true;
+    }
+
+    // Перевод AssetsTab::doReassign + ReassignDialog.
+    function reassignSelected() {
+        if (!requireSelection('Выберите технику')) return;
+        const tr = selectedRow();
+        if (tr.dataset.assigned !== 'true') { alert('Техника не выдана'); return; }
+        if (document.getElementById('reassign-employee').options.length === 0) {
+            alert('Нет активных фотографов');
+            return;
+        }
+        document.getElementById('reassign-asset-id').value = selectedId;
+        document.getElementById('reassign-label').textContent =
+            tr.dataset.inv + ' — ' + tr.dataset.model;
+        document.getElementById('reassign-holder-static').textContent = tr.dataset.holder;
+        openDialog('reassign-asset-dialog');
+    }
+
+    function validateReassign() {
+        if (document.getElementById('reassign-employee').options.length === 0) {
+            alert('Нет активных фотографов');
+            return false;
+        }
+        return true;
+    }
+
+    // Перевод AssetsTab::historyCb + doHistory: страница «История выдач».
+    function historySelected() {
+        if (!requireSelection('Выберите строку')) return;
+        const tr = selectedRow();
+        const params = new URLSearchParams({
+            id: selectedId,
+            inv: tr.dataset.inv,
+            model: tr.dataset.model
+        });
+        window.location.href = '/assets/history?' + params;
     }
 
     function openDialog(id) { document.getElementById(id).showModal(); }
