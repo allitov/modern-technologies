@@ -3,7 +3,9 @@ package io.allitov.cadr.web;
 import io.allitov.cadr.domain.Asset;
 import io.allitov.cadr.domain.Employee;
 import io.allitov.cadr.service.AssetRow;
-import io.allitov.cadr.service.CadrService;
+import io.allitov.cadr.service.AssetService;
+import io.allitov.cadr.service.AssignmentService;
+import io.allitov.cadr.service.EmployeeService;
 import io.allitov.cadr.service.PagedAssets;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -23,7 +25,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CadrController {
 
-    private final CadrService cadrService;
+    private final EmployeeService employeeService;
+    private final AssetService assetService;
+    private final AssignmentService assignmentService;
 
     private static final int PAGE_SIZE = 20;
 
@@ -39,7 +43,7 @@ public class CadrController {
     ) {
         List<Employee> employees = new ArrayList<>();
         try {
-            employees = cadrService.employees().stream()
+            employees = employeeService.employees().stream()
                     .filter(e -> matches(e, search))
                     .toList();
         } catch (RuntimeException e) {
@@ -65,7 +69,7 @@ public class CadrController {
             return "redirect:/employees";
         }
         try {
-            cadrService.addEmployee(fullName, email);
+            employeeService.addEmployee(fullName, email);
         } catch (RuntimeException e) {
             ra.addFlashAttribute("error", "Ошибка: " + e.getMessage());
         }
@@ -74,7 +78,7 @@ public class CadrController {
 
     @GetMapping("/employees/edit")
     public String editEmployee(@RequestParam long id, Model model) {
-        Employee employee = cadrService.employees().stream()
+        Employee employee = employeeService.employees().stream()
                 .filter(e -> e.getId() == id)
                 .findFirst()
                 .orElse(null);
@@ -102,7 +106,7 @@ public class CadrController {
             return "redirect:/employees/edit?id=" + id;
         }
         try {
-            cadrService.updateEmployee(id, fullName, email, active);
+            employeeService.updateEmployee(id, fullName, email, active);
         } catch (RuntimeException e) {
             ra.addFlashAttribute("error", "Ошибка: " + e.getMessage());
             return "redirect:/employees/edit?id=" + id;
@@ -119,10 +123,10 @@ public class CadrController {
         List<AssetRow> rows = new ArrayList<>();
         boolean hasNext = false;
         try {
-            PagedAssets paged = cadrService.listAssetsPaged(page, PAGE_SIZE, filter);
+            PagedAssets paged = assetService.listAssetsPaged(page, PAGE_SIZE, filter);
             if (paged.items().isEmpty() && page > 0) {
                 page = 0;
-                paged = cadrService.listAssetsPaged(page, PAGE_SIZE, filter);
+                paged = assetService.listAssetsPaged(page, PAGE_SIZE, filter);
             }
             rows = paged.items();
             hasNext = paged.hasNext();
@@ -134,8 +138,8 @@ public class CadrController {
         model.addAttribute("filters", List.of("Все", "В стойке", "На съёмке"));
         model.addAttribute("page", page);
         model.addAttribute("hasNext", hasNext);
-        model.addAttribute("activeEmployees", cadrService.activeEmployees());
-        model.addAttribute("freeAssets", cadrService.freeAssets());
+        model.addAttribute("activeEmployees", employeeService.activeEmployees());
+        model.addAttribute("freeAssets", assetService.freeAssets());
         return "assets";
     }
 
@@ -155,7 +159,7 @@ public class CadrController {
             return "redirect:/assets";
         }
         try {
-            cadrService.addAsset(inventoryNumber, model, category);
+            assetService.addAsset(inventoryNumber, model, category);
         } catch (RuntimeException e) {
             ra.addFlashAttribute("error", "Ошибка: " + e.getMessage());
         }
@@ -169,7 +173,7 @@ public class CadrController {
             RedirectAttributes ra
     ) {
         try {
-            cadrService.duplicateAsset(assetId, inventoryNumber);
+            assetService.duplicateAsset(assetId, inventoryNumber);
         } catch (RuntimeException e) {
             ra.addFlashAttribute("error", "Ошибка: " + e.getMessage());
         }
@@ -179,7 +183,7 @@ public class CadrController {
     @PostMapping("/assets/delete")
     public String deleteAsset(@RequestParam long assetId, RedirectAttributes ra) {
         try {
-            cadrService.deleteAssetCascade(assetId);
+            assetService.deleteAssetCascade(assetId);
         } catch (RuntimeException e) {
             ra.addFlashAttribute("error", "Ошибка: " + e.getMessage());
         }
@@ -193,7 +197,7 @@ public class CadrController {
             RedirectAttributes ra
     ) {
         try {
-            cadrService.issue(assetId, employeeId);
+            assignmentService.issue(assetId, employeeId);
         } catch (RuntimeException e) {
             ra.addFlashAttribute("error", "Ошибка: " + e.getMessage());
         }
@@ -207,7 +211,7 @@ public class CadrController {
             RedirectAttributes ra
     ) {
         try {
-            cadrService.issueMultiple(assetIds, employeeId);
+            assignmentService.issueMultiple(assetIds, employeeId);
         } catch (RuntimeException e) {
             ra.addFlashAttribute("error", "Ошибка: " + e.getMessage());
         }
@@ -221,7 +225,7 @@ public class CadrController {
             RedirectAttributes ra
     ) {
         try {
-            cadrService.reassignAsset(assetId, employeeId);
+            assignmentService.reassignAsset(assetId, employeeId);
         } catch (RuntimeException e) {
             ra.addFlashAttribute("error", "Ошибка: " + e.getMessage());
         }
@@ -231,7 +235,7 @@ public class CadrController {
     @PostMapping("/assets/return")
     public String giveBack(@RequestParam long assetId, RedirectAttributes ra) {
         try {
-            cadrService.giveBack(assetId);
+            assignmentService.giveBack(assetId);
         } catch (RuntimeException e) {
             ra.addFlashAttribute("error", "Ошибка: " + e.getMessage());
         }
@@ -249,7 +253,7 @@ public class CadrController {
         List<Asset> results = new ArrayList<>();
         if (searched) {
             try {
-                results = cadrService.searchAssets("Все".equals(category) ? "" : category, onlyFree, text);
+                results = assetService.searchAssets("Все".equals(category) ? "" : category, onlyFree, text);
             } catch (RuntimeException e) {
                 model.addAttribute("error", "Ошибка: " + e.getMessage());
             }
@@ -275,7 +279,7 @@ public class CadrController {
         try {
             DateTimeFormatter date = DateTimeFormatter.ofPattern("dd.MM.yyyy")
                     .withZone(ZoneId.systemDefault());
-            rows = cadrService.assetHistory(id).stream()
+            rows = assignmentService.assetHistory(id).stream()
                     .map(e -> new HistoryView(
                             e.employeeName(),
                             formatDate(e.assignment().getIssuedAt(), date),
