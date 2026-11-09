@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -24,6 +25,15 @@ public class AssetService {
 
     private final AssetRepository assetRepository;
     private final AssignmentRepository assignmentRepository;
+
+    private static final Supplier<DomainError> ASSET_NOT_FOUND =
+            () -> new DomainError("Техника не найдена");
+    private static final Supplier<DomainError> CANNOT_DELETE_ASSIGNED_ASSET =
+            () -> new DomainError("Нельзя удалить выданную технику — сначала примите возврат");
+
+    private static Supplier<DomainError> inventoryNumberAlreadyExists(String inv) {
+        return () -> new DomainError("Инвентарный номер %s уже существует".formatted(inv));
+    }
 
     @Transactional(readOnly = true)
     public List<AssetRow> assets() {
@@ -41,7 +51,7 @@ public class AssetService {
     @Transactional
     public void addAsset(String inv, String model, String category) {
         if (assetRepository.existsByInventoryNumber(inv)) {
-            throw new DomainError("Инвентарный номер " + inv + " уже существует");
+            throw inventoryNumberAlreadyExists(inv).get();
         }
         Asset a = new Asset();
         a.setInventoryNumber(inv);
@@ -59,9 +69,9 @@ public class AssetService {
     @Transactional
     public void duplicateAsset(long sourceId, String newInv) {
         Asset source = assetRepository.findById(sourceId)
-                .orElseThrow(() -> new DomainError("Техника не найдена"));
+                .orElseThrow(ASSET_NOT_FOUND);
         if (assetRepository.existsByInventoryNumber(newInv)) {
-            throw new DomainError("Инвентарный номер " + newInv + " уже существует");
+            throw inventoryNumberAlreadyExists(newInv).get();
         }
         Asset copy = new Asset();
         copy.setInventoryNumber(newInv);
@@ -126,9 +136,9 @@ public class AssetService {
     @Transactional
     public void deleteAssetCascade(long assetId) {
         Asset asset = assetRepository.findById(assetId)
-                .orElseThrow(() -> new DomainError("Техника не найдена"));
+                .orElseThrow(ASSET_NOT_FOUND);
         if (asset.isAssigned()) {
-            throw new DomainError("Нельзя удалить выданную технику — сначала примите возврат");
+            throw CANNOT_DELETE_ASSIGNED_ASSET.get();
         }
         assignmentRepository.deleteByAssetId(assetId);
         assetRepository.delete(asset);
