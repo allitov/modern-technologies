@@ -1,10 +1,15 @@
 package io.allitov.imgprocessor;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 import java.util.Optional;
 
 /**
  * Режим пакетной обработки изображений.
  */
+@Getter
+@RequiredArgsConstructor
 public enum ProcessingMode {
 
     SEQUENTIAL(1, "Sequential"),
@@ -14,19 +19,6 @@ public enum ProcessingMode {
     private final int number;
 
     private final String label;
-
-    ProcessingMode(int number, String label) {
-        this.number = number;
-        this.label = label;
-    }
-
-    public int getNumber() {
-        return number;
-    }
-
-    public String getLabel() {
-        return label;
-    }
 
     /**
      * Возвращает режим по его номеру в меню.

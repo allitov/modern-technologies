@@ -1,10 +1,15 @@
 package io.allitov.imgprocessor;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 import java.util.Optional;
 
 /**
  * Операция обработки изображения.
  */
+@Getter
+@RequiredArgsConstructor
 public enum Operation {
 
     GRAYSCALE(1, "Grayscale"),
@@ -16,19 +21,6 @@ public enum Operation {
     private final int number;
 
     private final String label;
-
-    Operation(int number, String label) {
-        this.number = number;
-        this.label = label;
-    }
-
-    public int getNumber() {
-        return number;
-    }
-
-    public String getLabel() {
-        return label;
-    }
 
     /**
      * Применяет операцию к изображению.
