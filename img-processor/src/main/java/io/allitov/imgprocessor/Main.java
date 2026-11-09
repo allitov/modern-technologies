@@ -29,23 +29,19 @@ import java.util.stream.Stream;
  * находятся вне класса {@link Image}.</p>
  *
  * <p>Использование: {@code Main [входной_каталог] [выходной_каталог]}.
- * По умолчанию обрабатывается каталог {@code images}, результат
- * сохраняется в {@code processed}.</p>
+ * По умолчанию обрабатывается каталог {@code src/main/resources/input},
+ * результат сохраняется в {@code src/main/resources/output}.</p>
  */
 @Slf4j
 public class Main {
 
-    /**
-     * Сигнал завершения работы для воркеров: реальный файл не может
-     * иметь пустой путь.
-     */
     private static final Path POISON_PILL = Path.of("");
 
     private static final Set<String> SUPPORTED_EXTENSIONS = Set.of(".png", ".jpg", ".jpeg", ".bmp", ".gif", ".tif", ".tiff");
 
     static void main(String[] args) {
-        Path inputDir = args.length > 0 ? Path.of(args[0]) : Path.of("images");
-        Path outputDir = args.length > 1 ? Path.of(args[1]) : Path.of("processed");
+        Path inputDir = args.length > 0 ? Path.of(args[0]) : Path.of("src/main/resources/input");
+        Path outputDir = args.length > 1 ? Path.of(args[1]) : Path.of("src/main/resources/output");
 
         List<Path> files = listImageFiles(inputDir);
         if (files.isEmpty()) {
@@ -64,6 +60,11 @@ public class Main {
         // поэтому число воркеров равно числу доступных ядер.
         int workerCount = Runtime.getRuntime().availableProcessors();
         BlockingQueue<Path> queue = new LinkedBlockingQueue<>(files);
+        // Сигналы завершения стоят в конце очереди, поэтому каждый воркер
+        // получит свой только после того, как все файлы будут обработаны.
+        for (int i = 0; i < workerCount; i++) {
+            queue.add(POISON_PILL);
+        }
         Stats stats = new Stats();
 
         log.info("Обработка запущена: {} файлов, воркеров: {}", files.size(), workerCount);
