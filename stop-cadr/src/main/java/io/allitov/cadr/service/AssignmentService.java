@@ -2,7 +2,6 @@ package io.allitov.cadr.service;
 
 import io.allitov.cadr.domain.Asset;
 import io.allitov.cadr.domain.Assignment;
-import io.allitov.cadr.domain.DomainError;
 import io.allitov.cadr.domain.Employee;
 import io.allitov.cadr.repository.AssetRepository;
 import io.allitov.cadr.repository.AssignmentRepository;
@@ -14,7 +13,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Supplier;
+
+import static io.allitov.cadr.exception.Exceptions.ASSET_ALREADY_AT_THIS_EMPLOYEE;
+import static io.allitov.cadr.exception.Exceptions.ASSET_ALREADY_ISSUED;
+import static io.allitov.cadr.exception.Exceptions.ASSET_NOT_FOUND;
+import static io.allitov.cadr.exception.Exceptions.ASSET_NOT_ISSUED;
+import static io.allitov.cadr.exception.Exceptions.CANNOT_ISSUE_TO_INACTIVE_EMPLOYEE;
+import static io.allitov.cadr.exception.Exceptions.CANNOT_REASSIGN_TO_INACTIVE_EMPLOYEE;
+import static io.allitov.cadr.exception.Exceptions.EMPLOYEE_NOT_FOUND;
+import static io.allitov.cadr.exception.Exceptions.NO_ACTIVE_ASSIGNMENT;
+import static io.allitov.cadr.exception.Exceptions.NO_ACTIVE_ASSIGNMENT_FOR_ASSET;
+import static io.allitov.cadr.exception.Exceptions.NO_ASSETS_SELECTED;
+import static io.allitov.cadr.exception.Exceptions.assetAlreadyIssued;
 
 /**
  * Сервис работы с выдачами техники: выдача, возврат, переназначение и история.
@@ -26,31 +36,6 @@ public class AssignmentService {
     private final AssignmentRepository assignmentRepository;
     private final AssetRepository assetRepository;
     private final EmployeeRepository employeeRepository;
-
-    private static final Supplier<DomainError> ASSET_NOT_FOUND =
-            () -> new DomainError("Техника не найдена");
-    private static final Supplier<DomainError> ASSET_ALREADY_ISSUED =
-            () -> new DomainError("Техника уже выдана");
-    private static final Supplier<DomainError> EMPLOYEE_NOT_FOUND =
-            () -> new DomainError("Фотограф не найден");
-    private static final Supplier<DomainError> CANNOT_ISSUE_TO_INACTIVE_EMPLOYEE =
-            () -> new DomainError("Нельзя выдать уволенному фотографу");
-    private static final Supplier<DomainError> NO_ACTIVE_ASSIGNMENT_FOR_ASSET =
-            () -> new DomainError("Нет активной выдачи для этой техники");
-    private static final Supplier<DomainError> NO_ASSETS_SELECTED =
-            () -> new DomainError("Не выбрано ни одной единицы техники");
-    private static final Supplier<DomainError> NO_ACTIVE_ASSIGNMENT =
-            () -> new DomainError("Нет активной выдачи");
-    private static final Supplier<DomainError> ASSET_NOT_ISSUED =
-            () -> new DomainError("Техника не выдана — используйте «Выдать»");
-    private static final Supplier<DomainError> ASSET_ALREADY_AT_THIS_EMPLOYEE =
-            () -> new DomainError("Техника уже у этого фотографа");
-    private static final Supplier<DomainError> CANNOT_REASSIGN_TO_INACTIVE_EMPLOYEE =
-            () -> new DomainError("Нельзя переназначить уволенному фотографу");
-
-    private static Supplier<DomainError> assetAlreadyIssued(String inventoryNumber) {
-        return () -> new DomainError("Техника %s уже выдана".formatted(inventoryNumber));
-    }
 
     @Transactional
     public void issue(long assetId, long employeeId) {

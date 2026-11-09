@@ -1,7 +1,6 @@
 package io.allitov.cadr.service;
 
 import io.allitov.cadr.domain.Asset;
-import io.allitov.cadr.domain.DomainError;
 import io.allitov.cadr.repository.AssetRepository;
 import io.allitov.cadr.repository.AssignmentRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import static io.allitov.cadr.exception.Exceptions.ASSET_NOT_FOUND;
+import static io.allitov.cadr.exception.Exceptions.CANNOT_DELETE_ASSIGNED_ASSET;
+import static io.allitov.cadr.exception.Exceptions.inventoryNumberAlreadyExists;
 
 /**
  * Сервис работы с техникой.
@@ -25,15 +27,6 @@ public class AssetService {
 
     private final AssetRepository assetRepository;
     private final AssignmentRepository assignmentRepository;
-
-    private static final Supplier<DomainError> ASSET_NOT_FOUND =
-            () -> new DomainError("Техника не найдена");
-    private static final Supplier<DomainError> CANNOT_DELETE_ASSIGNED_ASSET =
-            () -> new DomainError("Нельзя удалить выданную технику — сначала примите возврат");
-
-    private static Supplier<DomainError> inventoryNumberAlreadyExists(String inv) {
-        return () -> new DomainError("Инвентарный номер %s уже существует".formatted(inv));
-    }
 
     @Transactional(readOnly = true)
     public List<AssetRow> assets() {

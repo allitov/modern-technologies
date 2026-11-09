@@ -1,6 +1,5 @@
 package io.allitov.cadr.service;
 
-import io.allitov.cadr.domain.DomainError;
 import io.allitov.cadr.domain.Employee;
 import io.allitov.cadr.repository.AssignmentRepository;
 import io.allitov.cadr.repository.EmployeeRepository;
@@ -9,7 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.function.Supplier;
+
+import static io.allitov.cadr.exception.Exceptions.EMPLOYEE_HAS_ASSIGNED_ASSETS;
+import static io.allitov.cadr.exception.Exceptions.EMPLOYEE_NOT_FOUND;
+import static io.allitov.cadr.exception.Exceptions.SET_EMPLOYEE_ACTIVE_NOT_IMPLEMENTED;
+import static io.allitov.cadr.exception.Exceptions.emailAlreadyExists;
 
 /**
  * Сервис работы с фотографами.
@@ -20,17 +23,6 @@ public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final AssignmentRepository assignmentRepository;
-
-    private static final Supplier<DomainError> EMPLOYEE_NOT_FOUND =
-            () -> new DomainError("Фотограф не найден");
-    private static final Supplier<DomainError> EMPLOYEE_HAS_ASSIGNED_ASSETS =
-            () -> new DomainError("У фотографа на руках техника — сначала примите возврат");
-    private static final Supplier<UnsupportedOperationException> SET_EMPLOYEE_ACTIVE_NOT_IMPLEMENTED =
-            () -> new UnsupportedOperationException("Service.setEmployeeActive not implemented");
-
-    private static Supplier<DomainError> emailAlreadyExists(String email) {
-        return () -> new DomainError("Фотограф с email %s уже существует".formatted(email));
-    }
 
     @Transactional(readOnly = true)
     public List<Employee> employees() {
