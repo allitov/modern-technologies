@@ -19,37 +19,15 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-/**
- * Пакетная обработка изображений.
- *
- * <p>Программа интерактивно запрашивает входной и выходной каталоги, операцию
- * обработки и режим выполнения, после чего обрабатывает все поддерживаемые
- * изображения из входного каталога и сохраняет результаты в формате PNG
- * в выходной каталог.</p>
- *
- * <p>Многопоточность построена на современных средствах {@code java.util.concurrent}:
- * виртуальные потоки ({@link Executors#newThreadPerTaskExecutor(ThreadFactory)}),
- * {@link BlockingQueue} как общая очередь задач (замена связки queue + mutex),
- * атомарные счётчики вместо блокировок. Все операции с многопоточностью
- * находятся вне класса {@link Image}. Весь вывод программы ведется в лог,
- * ввод параметров выполняется через консоль.</p>
- */
 @Slf4j
 public class Main {
 
-    // Рабочим каталогом при запуске через Gradle является каталог модуля,
-    // поэтому пути по умолчанию ищутся относительно него, а затем относительно
-    // корня репозитория.
     private static final Path DEFAULT_INPUT_DIR = resolveDefaultDir(
         "src/main/resources/input", "img-processor/src/main/resources/input");
 
     private static final Path DEFAULT_OUTPUT_DIR = resolveDefaultDir(
         "src/main/resources/output", "img-processor/src/main/resources/output");
 
-    /**
-     * Сигнал завершения работы для воркеров: реальный файл не может
-     * иметь пустой путь.
-     */
     private static final Path POISON_PILL = Path.of("");
 
     private static final Set<String> SUPPORTED_EXTENSIONS = Set.of(".png", ".jpg", ".jpeg", ".bmp", ".gif", ".tif", ".tiff");
